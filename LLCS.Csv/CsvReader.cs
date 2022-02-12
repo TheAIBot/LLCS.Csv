@@ -220,6 +220,11 @@ namespace LLCS.Csv
             return false;
         }
 
+        public bool TryRead(bool lastCellInRecord, out int value)
+        {
+            return TryReadInt(lastCellInRecord, out value);
+        }
+
         public bool TryRead<T>(bool lastCellInRecord, out T value)
         {
             if (typeof(T) == typeof(long))
@@ -306,18 +311,15 @@ namespace LLCS.Csv
         private ReadOnlySpan<char> ReadCell(bool lastCellInRecord)
         {
             char separator = lastCellInRecord ? '\n' : _separator;
-            int readCount = 0;
             do
             {
                 ReadOnlySpan<char> bufferData = _buffer.Span;
-                int sepIndex = bufferData.Slice(readCount).IndexOf(separator);
+                int sepIndex = bufferData.IndexOf(separator);
                 if (sepIndex != -1)
                 {
-                    int cellLength = readCount + sepIndex;
-                    return bufferData.Slice(0, cellLength);
+                    return bufferData.Slice(0, sepIndex);
                 }
 
-                readCount = bufferData.Length;
             } while (ReadMoreData());
 
             // Last cell is what remains in the buffer
