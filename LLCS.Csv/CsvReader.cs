@@ -11,6 +11,7 @@ namespace LLCS.Csv
     {
         private readonly StreamReader _stream;
         private readonly CultureInfo _culture;
+        private readonly NumberFormatInfo _numberFormatInfo;
         private readonly char _separator;
         private bool _endOfFile = false;
         private char[] _bufferArray;
@@ -30,6 +31,7 @@ namespace LLCS.Csv
         {
             _stream = stream;
             _culture = culture;
+            _numberFormatInfo = culture.NumberFormat;
             _separator = culture.TextInfo.ListSeparator[0];
             _endOfFile = false;
             _bufferArray = new char[1024];
@@ -103,7 +105,7 @@ namespace LLCS.Csv
         public bool TryReadLong(bool lastCellInRecord, out long value)
         {
             ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (long.TryParse(cell, SignedIntegerParseStyle, _culture, out value))
+            if (long.TryParse(cell, SignedIntegerParseStyle, _numberFormatInfo, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -115,7 +117,7 @@ namespace LLCS.Csv
         public bool TryReadULong(bool lastCellInRecord, out ulong value)
         {
             ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (ulong.TryParse(cell, UnsignedIntegerParseStype, _culture, out value))
+            if (ulong.TryParse(cell, UnsignedIntegerParseStype, _numberFormatInfo, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -127,7 +129,7 @@ namespace LLCS.Csv
         public bool TryReadInt(bool lastCellInRecord, out int value)
         {
             ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (int.TryParse(cell, SignedIntegerParseStyle, _culture, out value))
+            if (int.TryParse(cell, SignedIntegerParseStyle, _numberFormatInfo, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -139,7 +141,7 @@ namespace LLCS.Csv
         public bool TryReadUInt(bool lastCellInRecord, out uint value)
         {
             ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (uint.TryParse(cell, UnsignedIntegerParseStype, _culture, out value))
+            if (uint.TryParse(cell, UnsignedIntegerParseStype, _numberFormatInfo, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -151,7 +153,7 @@ namespace LLCS.Csv
         public bool TryReadNInt(bool lastCellInRecord, out nint value)
         {
             ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (nint.TryParse(cell, SignedIntegerParseStyle, _culture, out value))
+            if (nint.TryParse(cell, SignedIntegerParseStyle, _numberFormatInfo, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -163,7 +165,7 @@ namespace LLCS.Csv
         public bool TryReadNUInt(bool lastCellInRecord, out nuint value)
         {
             ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (nuint.TryParse(cell, UnsignedIntegerParseStype, _culture, out value))
+            if (nuint.TryParse(cell, UnsignedIntegerParseStype, _numberFormatInfo, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -175,7 +177,7 @@ namespace LLCS.Csv
         public bool TryReadShort(bool lastCellInRecord, out short value)
         {
             ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (short.TryParse(cell, SignedIntegerParseStyle, _culture, out value))
+            if (short.TryParse(cell, SignedIntegerParseStyle, _numberFormatInfo, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -187,7 +189,7 @@ namespace LLCS.Csv
         public bool TryReadUShort(bool lastCellInRecord, out ushort value)
         {
             ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (ushort.TryParse(cell, UnsignedIntegerParseStype, _culture, out value))
+            if (ushort.TryParse(cell, UnsignedIntegerParseStype, _numberFormatInfo, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -199,7 +201,7 @@ namespace LLCS.Csv
         public bool TryReadSByte(bool lastCellInRecord, out sbyte value)
         {
             ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (sbyte.TryParse(cell, SignedIntegerParseStyle, _culture, out value))
+            if (sbyte.TryParse(cell, SignedIntegerParseStyle, _numberFormatInfo, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -211,7 +213,7 @@ namespace LLCS.Csv
         public bool TryReadByte(bool lastCellInRecord, out byte value)
         {
             ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (byte.TryParse(cell, UnsignedIntegerParseStype, _culture, out value))
+            if (byte.TryParse(cell, UnsignedIntegerParseStype, _numberFormatInfo, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
