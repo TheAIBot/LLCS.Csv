@@ -23,7 +23,7 @@ namespace MyBenchmarks
         [IterationSetup]
         public void CreateCsvReader()
         {
-            _reader = CsvReader<Csv10IntsRecord>.FromFile<Csv10IntsRecord>(FilePath);
+            _reader = CsvReader<Csv10IntsRecord>.FromFile(FilePath);
         }
 
         [Benchmark]
@@ -51,7 +51,7 @@ namespace MyBenchmarks
         public static void Main(string[] args)
         {
             var FilePath = @"Q:\Github\LLCS.Csv\LLCS.Csv.Profiler\bin\Release\net6.0\bf0b42a8-fe2f-4b8c-b313-0d258a9fb237\bin\Release\net6.0\csv_ints_profile_file.csv";
-            using var _reader = CsvReader<Csv10IntsRecord>.FromFile<Csv10IntsRecord>(FilePath);
+            using var _reader = CsvReader<Csv10IntsRecord>.FromFile(FilePath);
             int count = 0;
             foreach (var record in _reader)
             {

@@ -9,41 +9,41 @@ namespace LLCS.Csv
 
     public sealed class CsvReader : IDisposable
     {
-        private readonly Stream _stream;
+        private readonly StreamReader _stream;
         private readonly CultureInfo _culture;
-        private readonly byte _separator;
+        private readonly char _separator;
         private bool _endOfFile = false;
-        private byte[] _bufferArray;
-        private Memory<byte> _buffer;
+        private char[] _bufferArray;
+        private Memory<char> _buffer;
         private const NumberStyles SignedIntegerParseStyle = NumberStyles.Integer;
         private const NumberStyles UnsignedIntegerParseStype = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite | NumberStyles.AllowThousands;
 
         internal bool CanReadMore => !_endOfFile || _buffer.Length > 0;
 
-        public CsvReader(Stream stream) : this(stream, CultureInfo.CurrentCulture)
+        public CsvReader(StreamReader stream) : this(stream, CultureInfo.CurrentCulture)
         { }
 
-        public CsvReader(Stream stream, string culture) : this(stream, CultureInfo.GetCultureInfo(culture))
+        public CsvReader(StreamReader stream, string culture) : this(stream, CultureInfo.GetCultureInfo(culture))
         { }
 
-        public CsvReader(Stream stream, CultureInfo culture)
+        public CsvReader(StreamReader stream, CultureInfo culture)
         {
             _stream = stream;
             _culture = culture;
-            _separator = (byte)culture.TextInfo.ListSeparator[0];
+            _separator = culture.TextInfo.ListSeparator[0];
             _endOfFile = false;
-            _bufferArray = new byte[1024];
-            _buffer = new Memory<byte>();
+            _bufferArray = new char[1024];
+            _buffer = new Memory<char>();
 
             ReadIntoBuffer();
         }
 
         public static CsvReader FromFile(string csvPath)
         {
-            return new CsvReader(File.OpenRead(csvPath));
+            return new CsvReader(new StreamReader(csvPath));
         }
 
-        public static CsvReader FromStream(Stream stream)
+        public static CsvReader FromStream(StreamReader stream)
         {
             return new CsvReader(stream);
         }
@@ -60,7 +60,7 @@ namespace LLCS.Csv
 
         public static CsvReader FromString(string csv, CultureInfo culture)
         {
-            return new CsvReader(new MemoryStream(Encoding.ASCII.GetBytes(csv)), culture);
+            return new CsvReader(new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(csv))), culture);
         }
 
         public long ReadLong(bool lastCellInRecord)
@@ -102,11 +102,8 @@ namespace LLCS.Csv
 
         public bool TryReadLong(bool lastCellInRecord, out long value)
         {
-            ReadOnlySpan<byte> cell = ReadCell(lastCellInRecord);
-
-            Span<char> charCell = stackalloc char[cell.Length];
-            WriteToChars(cell, charCell);
-            if (long.TryParse(charCell, SignedIntegerParseStyle, _culture, out value))
+            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
+            if (long.TryParse(cell, SignedIntegerParseStyle, _culture, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -117,11 +114,8 @@ namespace LLCS.Csv
 
         public bool TryReadULong(bool lastCellInRecord, out ulong value)
         {
-            ReadOnlySpan<byte> cell = ReadCell(lastCellInRecord);
-
-            Span<char> charCell = stackalloc char[cell.Length];
-            WriteToChars(cell, charCell);
-            if (ulong.TryParse(charCell, UnsignedIntegerParseStype, _culture, out value))
+            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
+            if (ulong.TryParse(cell, UnsignedIntegerParseStype, _culture, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -130,14 +124,10 @@ namespace LLCS.Csv
             return false;
         }
 
-        [SkipLocalsInit]
         public bool TryReadInt(bool lastCellInRecord, out int value)
         {
-            ReadOnlySpan<byte> cell = ReadCell(lastCellInRecord);
-
-            Span<char> charCell = stackalloc char[cell.Length];
-            WriteToChars(cell, charCell);
-            if (int.TryParse(charCell, SignedIntegerParseStyle, _culture, out value))
+            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
+            if (int.TryParse(cell, SignedIntegerParseStyle, _culture, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -148,11 +138,8 @@ namespace LLCS.Csv
 
         public bool TryReadUInt(bool lastCellInRecord, out uint value)
         {
-            ReadOnlySpan<byte> cell = ReadCell(lastCellInRecord);
-
-            Span<char> charCell = stackalloc char[cell.Length];
-            WriteToChars(cell, charCell);
-            if (uint.TryParse(charCell, UnsignedIntegerParseStype, _culture, out value))
+            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
+            if (uint.TryParse(cell, UnsignedIntegerParseStype, _culture, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -163,11 +150,8 @@ namespace LLCS.Csv
 
         public bool TryReadNInt(bool lastCellInRecord, out nint value)
         {
-            ReadOnlySpan<byte> cell = ReadCell(lastCellInRecord);
-
-            Span<char> charCell = stackalloc char[cell.Length];
-            WriteToChars(cell, charCell);
-            if (nint.TryParse(charCell, SignedIntegerParseStyle, _culture, out value))
+            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
+            if (nint.TryParse(cell, SignedIntegerParseStyle, _culture, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -178,11 +162,8 @@ namespace LLCS.Csv
 
         public bool TryReadNUInt(bool lastCellInRecord, out nuint value)
         {
-            ReadOnlySpan<byte> cell = ReadCell(lastCellInRecord);
-
-            Span<char> charCell = stackalloc char[cell.Length];
-            WriteToChars(cell, charCell);
-            if (nuint.TryParse(charCell, UnsignedIntegerParseStype, _culture, out value))
+            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
+            if (nuint.TryParse(cell, UnsignedIntegerParseStype, _culture, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -193,11 +174,8 @@ namespace LLCS.Csv
 
         public bool TryReadShort(bool lastCellInRecord, out short value)
         {
-            ReadOnlySpan<byte> cell = ReadCell(lastCellInRecord);
-
-            Span<char> charCell = stackalloc char[cell.Length];
-            WriteToChars(cell, charCell);
-            if (short.TryParse(charCell, SignedIntegerParseStyle, _culture, out value))
+            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
+            if (short.TryParse(cell, SignedIntegerParseStyle, _culture, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -208,11 +186,8 @@ namespace LLCS.Csv
 
         public bool TryReadUShort(bool lastCellInRecord, out ushort value)
         {
-            ReadOnlySpan<byte> cell = ReadCell(lastCellInRecord);
-
-            Span<char> charCell = stackalloc char[cell.Length];
-            WriteToChars(cell, charCell);
-            if (ushort.TryParse(charCell, UnsignedIntegerParseStype, _culture, out value))
+            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
+            if (ushort.TryParse(cell, UnsignedIntegerParseStype, _culture, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -223,11 +198,8 @@ namespace LLCS.Csv
 
         public bool TryReadSByte(bool lastCellInRecord, out sbyte value)
         {
-            ReadOnlySpan<byte> cell = ReadCell(lastCellInRecord);
-
-            Span<char> charCell = stackalloc char[cell.Length];
-            WriteToChars(cell, charCell);
-            if (sbyte.TryParse(charCell, SignedIntegerParseStyle, _culture, out value))
+            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
+            if (sbyte.TryParse(cell, SignedIntegerParseStyle, _culture, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -238,11 +210,8 @@ namespace LLCS.Csv
 
         public bool TryReadByte(bool lastCellInRecord, out byte value)
         {
-            ReadOnlySpan<byte> cell = ReadCell(lastCellInRecord);
-
-            Span<char> charCell = stackalloc char[cell.Length];
-            WriteToChars(cell, charCell);
-            if (byte.TryParse(charCell, UnsignedIntegerParseStype, _culture, out value))
+            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
+            if (byte.TryParse(cell, UnsignedIntegerParseStype, _culture, out value))
             {
                 AdvanceBuffer(cell);
                 return true;
@@ -329,18 +298,18 @@ namespace LLCS.Csv
             }
         }
 
-        private void AdvanceBuffer(ReadOnlySpan<byte> cell)
+        private void AdvanceBuffer(ReadOnlySpan<char> cell)
         {
             _buffer = _buffer.Slice(Math.Min(_buffer.Length, cell.Length + 1));
         }
 
-        private ReadOnlySpan<byte> ReadCell(bool lastCellInRecord)
+        private ReadOnlySpan<char> ReadCell(bool lastCellInRecord)
         {
-            byte separator = lastCellInRecord ? (byte)'\n' : _separator;
+            char separator = lastCellInRecord ? '\n' : _separator;
             int readCount = 0;
             do
             {
-                ReadOnlySpan<byte> bufferData = _buffer.Span;
+                ReadOnlySpan<char> bufferData = _buffer.Span;
                 int sepIndex = bufferData.Slice(readCount).IndexOf(separator);
                 if (sepIndex != -1)
                 {
@@ -378,7 +347,7 @@ namespace LLCS.Csv
 
         private void MoveDataToStartOfBufferBuffer()
         {
-            Memory<byte> currentDataAtStart = new Memory<byte>(_bufferArray, 0, _buffer.Length);
+            Memory<char> currentDataAtStart = new Memory<char>(_bufferArray, 0, _buffer.Length);
             _buffer.CopyTo(currentDataAtStart);
             _buffer = currentDataAtStart;
         }
@@ -386,8 +355,8 @@ namespace LLCS.Csv
         private void ExtendBuffer()
         {
             // Move data to start of extended buffer which then replaced the current buffer
-            byte[] extendedBuffer = new byte[_bufferArray.Length * 2];
-            Memory<byte> extendedBufferMem = new Memory<byte>(extendedBuffer);
+            char[] extendedBuffer = new char[_bufferArray.Length * 2];
+            Memory<char> extendedBufferMem = new Memory<char>(extendedBuffer);
             _buffer.CopyTo(extendedBufferMem);
 
             _bufferArray = extendedBuffer;
@@ -397,37 +366,21 @@ namespace LLCS.Csv
         private void ReadIntoBuffer()
         {
             // Read data into remaining space
-            int bytesToRead = _bufferArray.Length - _buffer.Length;
-            int bytesRead = _stream.Read(_bufferArray.AsSpan(_buffer.Length));
-            if (bytesRead < bytesToRead)
+            int charsToRead = _bufferArray.Length - _buffer.Length;
+            int charsRead = _stream.Read(_bufferArray.AsSpan(_buffer.Length));
+            if (charsRead < charsToRead)
             {
                 _endOfFile = true;
             }
 
             // Extend buffer with newly read data
-            _buffer = new Memory<byte>(_bufferArray, 0, _buffer.Length + bytesRead);
-        }
-
-        private static ReadOnlySpan<byte> TrimCell(ReadOnlySpan<byte> cell)
-        {
-            ReadOnlySpan<byte> charsToTrim = new byte[] { (byte)' ', (byte)'\r', (byte)'\n' };
-            return cell.Trim(charsToTrim);
-        }
-
-        private static void WriteToChars(ReadOnlySpan<byte> bytes, Span<char> chars)
-        {
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                chars[i] = (char)bytes[i];
-            }
+            _buffer = new Memory<char>(_bufferArray, 0, _buffer.Length + charsRead);
         }
 
         private void ThrowParseException(bool lastCellInRecord, string type)
         {
-            ReadOnlySpan<byte> cell = ReadCell(lastCellInRecord);
-            Span<char> charCell = stackalloc char[cell.Length];
-            WriteToChars(cell, charCell);
-            throw new InvalidDataException($"Failed to parse {type}. Text: \"{charCell}\"");
+            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
+            throw new InvalidDataException($"Failed to parse {type}. Text: \"{cell}\"");
         }
 
         public void Dispose()
@@ -443,40 +396,40 @@ namespace LLCS.Csv
 
         internal bool CanReadMore => _reader.CanReadMore;
 
-        public CsvReader(Stream stream) : this(stream, CultureInfo.CurrentCulture)
+        public CsvReader(StreamReader stream) : this(stream, CultureInfo.CurrentCulture)
         { }
 
-        public CsvReader(Stream stream, string culture) : this(stream, CultureInfo.GetCultureInfo(culture))
+        public CsvReader(StreamReader stream, string culture) : this(stream, CultureInfo.GetCultureInfo(culture))
         { }
 
-        public CsvReader(Stream stream, CultureInfo culture)
+        public CsvReader(StreamReader stream, CultureInfo culture)
         {
             _reader = new CsvReader(stream, culture);
         }
 
-        public static CsvReader<U> FromFile<U>(string csvPath) where U : ICsvSerializer, new()
+        public static CsvReader<T> FromFile(string csvPath)
         {
-            return new CsvReader<U>(File.OpenRead(csvPath));
+            return new CsvReader<T>(new StreamReader(csvPath));
         }
 
-        public static CsvReader<U> FromStream<U>(Stream stream) where U : ICsvSerializer, new()
+        public static CsvReader<T> FromStream(StreamReader stream)
         {
-            return new CsvReader<U>(stream);
+            return new CsvReader<T>(stream);
         }
 
-        public static CsvReader<U> FromString<U>(string csv) where U : ICsvSerializer, new()
+        public static CsvReader<T> FromString(string csv)
         {
-            return FromString<U>(csv, CultureInfo.CurrentCulture);
+            return FromString(csv, CultureInfo.CurrentCulture);
         }
 
-        public static CsvReader<U> FromString<U>(string csv, string culture) where U : ICsvSerializer, new()
+        public static CsvReader<T> FromString(string csv, string culture)
         {
-            return FromString<U>(csv, CultureInfo.GetCultureInfo(culture));
+            return FromString(csv, CultureInfo.GetCultureInfo(culture));
         }
 
-        public static CsvReader<U> FromString<U>(string csv, CultureInfo culture) where U : ICsvSerializer, new()
+        public static CsvReader<T> FromString(string csv, CultureInfo culture)
         {
-            return new CsvReader<U>(new MemoryStream(Encoding.ASCII.GetBytes(csv)), culture);
+            return new CsvReader<T>(new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(csv))), culture);
         }
 
         public bool TryReadRecord(out T record)

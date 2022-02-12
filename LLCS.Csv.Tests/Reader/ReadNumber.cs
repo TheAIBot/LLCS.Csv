@@ -112,7 +112,7 @@ namespace LLCS.Csv.Tests.Reader
                 CreateCsv(culture, 5),
                 CreateCsv(culture, 6));
             OneValueStruct<T>[] expectedValues = Enumerable.Range(1, 6).Select(x => new OneValueStruct<T>(CastHelper<T>.CastTo(x))).ToArray();
-            using CsvReader<OneValueStruct<T>> reader = CsvReader<OneValueStruct<T>>.FromString<OneValueStruct<T>>(csv, culture);
+            using CsvReader<OneValueStruct<T>> reader = CsvReader<OneValueStruct<T>>.FromString(csv, culture);
 
             OneValueStruct<T>[] actualValues = reader.ToArray();
 
@@ -131,7 +131,7 @@ namespace LLCS.Csv.Tests.Reader
                 CreateCsv(culture, 5, 6),
                 CreateCsv(culture, 6, 7));
             TwoValueStruct<T, T>[] expectedValues = Enumerable.Range(1, 6).Select(x => new TwoValueStruct<T, T>(CastHelper<T>.CastTo(x), CastHelper<T>.CastTo(x + 1))).ToArray();
-            using CsvReader<TwoValueStruct<T, T>> reader = CsvReader<TwoValueStruct<T, T>>.FromString<TwoValueStruct<T, T>>(csv, culture);
+            using CsvReader<TwoValueStruct<T, T>> reader = CsvReader<TwoValueStruct<T, T>>.FromString(csv, culture);
 
             TwoValueStruct<T, T>[] actualValues = reader.ToArray();
 
