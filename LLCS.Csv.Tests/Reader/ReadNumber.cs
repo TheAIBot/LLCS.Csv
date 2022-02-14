@@ -27,48 +27,48 @@ namespace LLCS.Csv.Tests.Reader
             yield return TestCase(Numeric<T>.MaxValue);
         }
 
-        [Theory]
-        [MemberData(nameof(SingleNumber))]
-        public void ParseSingleNumber(string csv, T expectedNumber)
-        {
-            CsvReader reader = CsvReader.FromString(csv);
+        //[Theory]
+        //[MemberData(nameof(SingleNumber))]
+        //public void ParseSingleNumber(string csv, T expectedNumber)
+        //{
+        //    CsvReader reader = CsvReader.FromString(csv);
 
-            T actualNumber;
-            bool couldRead = reader.TryRead(true, out actualNumber);
+        //    T actualNumber;
+        //    bool couldRead = reader.TryRead(true, out actualNumber);
 
-            Assert.True(couldRead);
-            Assert.Equal(expectedNumber, actualNumber);
-        }
+        //    Assert.True(couldRead);
+        //    Assert.Equal(expectedNumber, actualNumber);
+        //}
 
-        public static IEnumerable<object[]> MultipleNumbers()
-        {
-            string[] cultures = new string[] { "da-DK", "en-US", "fr-FR" };
-            foreach (var culture in cultures)
-            {
-                yield return CreateRecord(culture, 1, 2);
-                yield return CreateRecord(culture, 1, 2, 3);
-                yield return CreateRecord(culture, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6);
-            }
-        }
+        //public static IEnumerable<object[]> MultipleNumbers()
+        //{
+        //    string[] cultures = new string[] { "da-DK", "en-US", "fr-FR" };
+        //    foreach (var culture in cultures)
+        //    {
+        //        yield return CreateRecord(culture, 1, 2);
+        //        yield return CreateRecord(culture, 1, 2, 3);
+        //        yield return CreateRecord(culture, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6);
+        //    }
+        //}
 
-        [Theory]
-        [MemberData(nameof(MultipleNumbers))]
-        public void ParseMultipleNumbers(string csv, string culture, T[] expectedNumbers)
-        {
-            using CsvReader reader = CsvReader.FromString(csv, culture);
+        //[Theory]
+        //[MemberData(nameof(MultipleNumbers))]
+        //public void ParseMultipleNumbers(string csv, string culture, T[] expectedNumbers)
+        //{
+        //    using CsvReader reader = CsvReader.FromString(csv, culture);
 
-            T[] actualNumbers = new T[expectedNumbers.Length];
-            bool[] couldReadNumber = new bool[actualNumbers.Length];
-            for (int i = 0; i < actualNumbers.Length; i++)
-            {
-                bool lastCellInRecord = i + 1 == actualNumbers.Length;
-                couldReadNumber[i] = reader.TryRead(lastCellInRecord, out actualNumbers[i]);
-            }
+        //    T[] actualNumbers = new T[expectedNumbers.Length];
+        //    bool[] couldReadNumber = new bool[actualNumbers.Length];
+        //    for (int i = 0; i < actualNumbers.Length; i++)
+        //    {
+        //        bool lastCellInRecord = i + 1 == actualNumbers.Length;
+        //        couldReadNumber[i] = reader.TryRead(lastCellInRecord, out actualNumbers[i]);
+        //    }
 
 
-            Assert.True(couldReadNumber.All(x => x));
-            Assert.Equal(expectedNumbers, actualNumbers);
-        }
+        //    Assert.True(couldReadNumber.All(x => x));
+        //    Assert.Equal(expectedNumbers, actualNumbers);
+        //}
 
         private static object[] CreateRecord(string cultureName, params int[] intValues)
         {

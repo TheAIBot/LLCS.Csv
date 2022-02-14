@@ -1,7 +1,8 @@
-﻿using System.Collections;
+﻿using Microsoft.Toolkit.HighPerformance;
+using System.Collections;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+using Microsoft.Toolkit.HighPerformance.Enumerables;
 using System.Text;
 
 namespace LLCS.Csv
@@ -34,7 +35,7 @@ namespace LLCS.Csv
             _numberFormatInfo = culture.NumberFormat;
             _separator = culture.TextInfo.ListSeparator[0];
             _endOfFile = false;
-            _bufferArray = new char[1024];
+            _bufferArray = new char[1024 * 16];
             _buffer = new Memory<char>();
 
             ReadIntoBuffer();
@@ -65,237 +66,181 @@ namespace LLCS.Csv
             return new CsvReader(new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(csv))), culture);
         }
 
-        public long ReadLong(bool lastCellInRecord)
+        public long ReadLong(ref ReadOnlySpanTokenizer<char> tokens)
         {
-            if (!TryReadLong(lastCellInRecord, out long value))
+            if (!TryReadLong(ref tokens, out long value))
             {
-                ThrowParseException(lastCellInRecord, "long");
-            }
-
-            return value;
-        }
-        public int ReadInt(bool lastCellInRecord)
-        {
-            if (!TryReadInt(lastCellInRecord, out int value))
-            {
-                ThrowParseException(lastCellInRecord, "int");
-            }
-
-            return value;
-        }
-        public short ReadShort(bool lastCellInRecord)
-        {
-            if (!TryReadShort(lastCellInRecord, out short value))
-            {
-                ThrowParseException(lastCellInRecord, "short");
-            }
-
-            return value;
-        }
-        public byte ReadByte(bool lastCellInRecord)
-        {
-            if (!TryReadByte(lastCellInRecord, out byte value))
-            {
-                ThrowParseException(lastCellInRecord, "byte");
+                ThrowParseException(tokens.Current, "long");
             }
 
             return value;
         }
 
-        public bool TryReadLong(bool lastCellInRecord, out long value)
+        public int ReadInt(ref ReadOnlySpanTokenizer<char> tokens)
         {
-            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (long.TryParse(cell, SignedIntegerParseStyle, _numberFormatInfo, out value))
+            if (!TryReadInt(ref tokens, out int value))
             {
-                AdvanceBuffer(cell);
-                return true;
+                ThrowParseException(tokens.Current, "int");
             }
 
-            return false;
+            return value;
         }
 
-        public bool TryReadULong(bool lastCellInRecord, out ulong value)
+        public short ReadShort(ref ReadOnlySpanTokenizer<char> tokens)
         {
-            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (ulong.TryParse(cell, UnsignedIntegerParseStype, _numberFormatInfo, out value))
+            if (!TryReadShort(ref tokens, out short value))
             {
-                AdvanceBuffer(cell);
-                return true;
+                ThrowParseException(tokens.Current, "short");
             }
 
-            return false;
+            return value;
         }
 
-        public bool TryReadInt(bool lastCellInRecord, out int value)
+        public byte ReadByte(ref ReadOnlySpanTokenizer<char> tokens)
         {
-            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (int.TryParse(cell, SignedIntegerParseStyle, _numberFormatInfo, out value))
+            if (!TryReadByte(ref tokens, out byte value))
             {
-                AdvanceBuffer(cell);
-                return true;
+                ThrowParseException(tokens.Current, "byte");
             }
 
-            return false;
+            return value;
         }
 
-        public bool TryReadUInt(bool lastCellInRecord, out uint value)
+        public bool TryReadLong(ref ReadOnlySpanTokenizer<char> tokens, out long value)
         {
-            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (uint.TryParse(cell, UnsignedIntegerParseStype, _numberFormatInfo, out value))
-            {
-                AdvanceBuffer(cell);
-                return true;
-            }
-
-            return false;
+            tokens.MoveNext();
+            return long.TryParse(tokens.Current, SignedIntegerParseStyle, _numberFormatInfo, out value);
         }
 
-        public bool TryReadNInt(bool lastCellInRecord, out nint value)
+        public bool TryReadULong(ref ReadOnlySpanTokenizer<char> tokens, out ulong value)
         {
-            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (nint.TryParse(cell, SignedIntegerParseStyle, _numberFormatInfo, out value))
-            {
-                AdvanceBuffer(cell);
-                return true;
-            }
-
-            return false;
+            tokens.MoveNext();
+            return ulong.TryParse(tokens.Current, UnsignedIntegerParseStype, _numberFormatInfo, out value);
         }
 
-        public bool TryReadNUInt(bool lastCellInRecord, out nuint value)
+        public bool TryReadInt(ref ReadOnlySpanTokenizer<char> tokens, out int value)
         {
-            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (nuint.TryParse(cell, UnsignedIntegerParseStype, _numberFormatInfo, out value))
-            {
-                AdvanceBuffer(cell);
-                return true;
-            }
-
-            return false;
+            tokens.MoveNext();
+            return int.TryParse(tokens.Current, SignedIntegerParseStyle, _numberFormatInfo, out value);
         }
 
-        public bool TryReadShort(bool lastCellInRecord, out short value)
+        public bool TryReadUInt(ref ReadOnlySpanTokenizer<char> tokens, out uint value)
         {
-            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (short.TryParse(cell, SignedIntegerParseStyle, _numberFormatInfo, out value))
-            {
-                AdvanceBuffer(cell);
-                return true;
-            }
-
-            return false;
+            tokens.MoveNext();
+            return uint.TryParse(tokens.Current, UnsignedIntegerParseStype, _numberFormatInfo, out value);
         }
 
-        public bool TryReadUShort(bool lastCellInRecord, out ushort value)
+        public bool TryReadNInt(ref ReadOnlySpanTokenizer<char> tokens, out nint value)
         {
-            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (ushort.TryParse(cell, UnsignedIntegerParseStype, _numberFormatInfo, out value))
-            {
-                AdvanceBuffer(cell);
-                return true;
-            }
-
-            return false;
+            tokens.MoveNext();
+            return nint.TryParse(tokens.Current, SignedIntegerParseStyle, _numberFormatInfo, out value);
         }
 
-        public bool TryReadSByte(bool lastCellInRecord, out sbyte value)
+        public bool TryReadNUInt(ref ReadOnlySpanTokenizer<char> tokens, out nuint value)
         {
-            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (sbyte.TryParse(cell, SignedIntegerParseStyle, _numberFormatInfo, out value))
-            {
-                AdvanceBuffer(cell);
-                return true;
-            }
-
-            return false;
+            tokens.MoveNext();
+            return nuint.TryParse(tokens.Current, UnsignedIntegerParseStype, _numberFormatInfo, out value);
         }
 
-        public bool TryReadByte(bool lastCellInRecord, out byte value)
+        public bool TryReadShort(ref ReadOnlySpanTokenizer<char> tokens, out short value)
         {
-            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            if (byte.TryParse(cell, UnsignedIntegerParseStype, _numberFormatInfo, out value))
-            {
-                AdvanceBuffer(cell);
-                return true;
-            }
-
-            return false;
+            tokens.MoveNext();
+            return short.TryParse(tokens.Current, SignedIntegerParseStyle, _numberFormatInfo, out value);
         }
 
-        public bool TryRead(bool lastCellInRecord, out int value)
+        public bool TryReadUShort(ref ReadOnlySpanTokenizer<char> tokens, out ushort value)
         {
-            return TryReadInt(lastCellInRecord, out value);
+            tokens.MoveNext();
+            return ushort.TryParse(tokens.Current, UnsignedIntegerParseStype, _numberFormatInfo, out value);
         }
 
-        public bool TryRead<T>(bool lastCellInRecord, out T value)
+        public bool TryReadSByte(ref ReadOnlySpanTokenizer<char> tokens, out sbyte value)
+        {
+            tokens.MoveNext();
+            return sbyte.TryParse(tokens.Current, SignedIntegerParseStyle, _numberFormatInfo, out value);
+        }
+
+        public bool TryReadByte(ref ReadOnlySpanTokenizer<char> tokens, out byte value)
+        {
+            tokens.MoveNext();
+            return byte.TryParse(tokens.Current, UnsignedIntegerParseStype, _numberFormatInfo, out value);
+        }
+
+        public bool TryRead(ref ReadOnlySpanTokenizer<char> tokens, out int value)
+        {
+            return TryReadInt(ref tokens, out value);
+        }
+
+        public bool TryRead<T>(ref ReadOnlySpanTokenizer<char> tokens, out T value)
         {
             if (typeof(T) == typeof(long))
             {
                 long valueRead;
-                bool couldRead = TryReadLong(lastCellInRecord, out valueRead);
+                bool couldRead = TryReadLong(ref tokens, out valueRead);
                 value = Unsafe.As<long, T>(ref valueRead);
                 return couldRead;
             }
             else if (typeof(T) == typeof(ulong))
             {
                 ulong valueRead;
-                bool couldRead = TryReadULong(lastCellInRecord, out valueRead);
+                bool couldRead = TryReadULong(ref tokens, out valueRead);
                 value = Unsafe.As<ulong, T>(ref valueRead);
                 return couldRead;
             }
-            else if (typeof(T) == typeof(int)) 
+            /*else*/
+            if (typeof(T) == typeof(int))
             {
                 int valueRead;
-                bool couldRead = TryReadInt(lastCellInRecord, out valueRead);
+                bool couldRead = TryReadInt(ref tokens, out valueRead);
                 value = Unsafe.As<int, T>(ref valueRead);
                 return couldRead;
             }
             else if (typeof(T) == typeof(uint))
             {
                 uint valueRead;
-                bool couldRead = TryReadUInt(lastCellInRecord, out valueRead);
+                bool couldRead = TryReadUInt(ref tokens, out valueRead);
                 value = Unsafe.As<uint, T>(ref valueRead);
                 return couldRead;
             }
             else if (typeof(T) == typeof(nint))
             {
                 nint valueRead;
-                bool couldRead = TryReadNInt(lastCellInRecord, out valueRead);
+                bool couldRead = TryReadNInt(ref tokens, out valueRead);
                 value = Unsafe.As<nint, T>(ref valueRead);
                 return couldRead;
             }
             else if (typeof(T) == typeof(nuint))
             {
                 nuint valueRead;
-                bool couldRead = TryReadNUInt(lastCellInRecord, out valueRead);
+                bool couldRead = TryReadNUInt(ref tokens, out valueRead);
                 value = Unsafe.As<nuint, T>(ref valueRead);
                 return couldRead;
             }
             else if (typeof(T) == typeof(short))
             {
                 short valueRead;
-                bool couldRead = TryReadShort(lastCellInRecord, out valueRead);
+                bool couldRead = TryReadShort(ref tokens, out valueRead);
                 value = Unsafe.As<short, T>(ref valueRead);
                 return couldRead;
             }
             else if (typeof(T) == typeof(ushort))
             {
                 ushort valueRead;
-                bool couldRead = TryReadUShort(lastCellInRecord, out valueRead);
+                bool couldRead = TryReadUShort(ref tokens, out valueRead);
                 value = Unsafe.As<ushort, T>(ref valueRead);
                 return couldRead;
             }
             else if (typeof(T) == typeof(sbyte))
             {
                 sbyte valueRead;
-                bool couldRead = TryReadSByte(lastCellInRecord, out valueRead);
+                bool couldRead = TryReadSByte(ref tokens, out valueRead);
                 value = Unsafe.As<sbyte, T>(ref valueRead);
                 return couldRead;
             }
             else if (typeof(T) == typeof(byte))
             {
                 byte valueRead;
-                bool couldRead = TryReadByte(lastCellInRecord, out valueRead);
+                bool couldRead = TryReadByte(ref tokens, out valueRead);
                 value = Unsafe.As<byte, T>(ref valueRead);
                 return couldRead;
             }
@@ -305,18 +250,28 @@ namespace LLCS.Csv
             }
         }
 
+        public bool TryReadRecord<T>(out T record) where T : ICsvSerializer, new()
+        {
+            ReadOnlySpan<char> recordChars = GetRecordChars();
+
+            record = new T();
+            var tokens = recordChars.Tokenize(_separator);
+            bool couldParse = record.TrySerialize(this, ref tokens);
+            AdvanceBuffer(recordChars);
+            return couldParse;
+        }
+
         private void AdvanceBuffer(ReadOnlySpan<char> cell)
         {
             _buffer = _buffer.Slice(Math.Min(_buffer.Length, cell.Length + 1));
         }
 
-        private ReadOnlySpan<char> ReadCell(bool lastCellInRecord)
+        private ReadOnlySpan<char> GetRecordChars()
         {
-            char separator = lastCellInRecord ? '\n' : _separator;
             do
             {
                 ReadOnlySpan<char> bufferData = _buffer.Span;
-                int sepIndex = bufferData.IndexOf(separator);
+                int sepIndex = bufferData.IndexOf('\n');
                 if (sepIndex != -1)
                 {
                     return bufferData.Slice(0, sepIndex);
@@ -381,10 +336,9 @@ namespace LLCS.Csv
             _buffer = new Memory<char>(_bufferArray, 0, _buffer.Length + charsRead);
         }
 
-        private void ThrowParseException(bool lastCellInRecord, string type)
+        private void ThrowParseException(ReadOnlySpan<char> token, string type)
         {
-            ReadOnlySpan<char> cell = ReadCell(lastCellInRecord);
-            throw new InvalidDataException($"Failed to parse {type}. Text: \"{cell}\"");
+            throw new InvalidDataException($"Failed to parse {type}. Text: \"{token}\"");
         }
 
         public void Dispose()
@@ -436,12 +390,6 @@ namespace LLCS.Csv
             return new CsvReader<T>(new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(csv))), culture);
         }
 
-        public bool TryReadRecord(out T record)
-        {
-            record = new T();
-            return record.TrySerialize(_reader);
-        }
-
         public ValueTask<T> ReadRecordAsync()
         {
             throw new NotImplementedException();
@@ -454,22 +402,22 @@ namespace LLCS.Csv
 
         public IEnumerator<T> GetEnumerator()
         {
-            return new CsvReaderIterator<T>(this);
+            return new CsvReaderIterator<T>(_reader);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new CsvReaderIterator<T>(this);
+            return new CsvReaderIterator<T>(_reader);
         }
 
         private struct CsvReaderIterator<U> : IEnumerator<U>
             where U : ICsvSerializer, new()
         {
-            private readonly CsvReader<U> _reader;
+            private readonly CsvReader _reader;
             public U Current { get; private set; }
             object IEnumerator.Current => Current;
 
-            public CsvReaderIterator(CsvReader<U> reader)
+            public CsvReaderIterator(CsvReader reader)
             {
                 _reader = reader;
                 Current = default(U)!;

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Security.Cryptography;
-using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
+﻿using BenchmarkDotNet.Attributes;
+using Microsoft.Toolkit.HighPerformance.Enumerables;
 using LLCS.Csv;
 
 namespace MyBenchmarks
@@ -53,11 +51,31 @@ namespace MyBenchmarks
         {
             var FilePath = @"Q:\Github\LLCS.Csv\LLCS.Csv.Profiler\bin\Release\net6.0\bf0b42a8-fe2f-4b8c-b313-0d258a9fb237\bin\Release\net6.0\csv_ints_profile_file.csv";
             using var _reader = CsvReader<Csv10IntsRecord>.FromFile(FilePath);
+
+
             int count = 0;
+            using CancellationTokenSource cancelSource = new CancellationTokenSource();
+            Task.Run(async () =>
+            {
+                int previousCount = 0;
+                using PeriodicTimer timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+                while (!cancelSource.IsCancellationRequested && await timer.WaitForNextTickAsync(cancelSource.Token))
+                {
+                    int change = count - previousCount;
+                    Console.WriteLine(change.ToString("N0"));
+
+                    previousCount = count;
+                }
+            });
+
+
+
+
             foreach (var record in _reader)
             {
-                count++;
+                count += 10;
             }
+            cancelSource.Cancel();
             Console.WriteLine(count);
 
             //var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
@@ -77,73 +95,73 @@ namespace MyBenchmarks
         public int Value9;
         public int Value10;
 
-        public bool TrySerialize(CsvReader reader)
+        public bool TrySerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens)
         {
             {
-                if (!reader.TryRead(false, out int value))
+                if (!reader.TryRead(ref tokens, out int value))
                 {
                     return false;
                 }
                 Value1 = value;
             }
             {
-                if (!reader.TryRead(false, out int value))
+                if (!reader.TryRead(ref tokens, out int value))
                 {
                     return false;
                 }
                 Value2 = value;
             }
             {
-                if (!reader.TryRead(false, out int value))
+                if (!reader.TryRead(ref tokens, out int value))
                 {
                     return false;
                 }
                 Value3 = value;
             }
             {
-                if (!reader.TryRead(false, out int value))
+                if (!reader.TryRead(ref tokens, out int value))
                 {
                     return false;
                 }
                 Value4 = value;
             }
             {
-                if (!reader.TryRead(false, out int value))
+                if (!reader.TryRead(ref tokens, out int value))
                 {
                     return false;
                 }
                 Value5 = value;
             }
             {
-                if (!reader.TryRead(false, out int value))
+                if (!reader.TryRead(ref tokens, out int value))
                 {
                     return false;
                 }
                 Value6 = value;
             }
             {
-                if (!reader.TryRead(false, out int value))
+                if (!reader.TryRead(ref tokens, out int value))
                 {
                     return false;
                 }
                 Value7 = value;
             }
             {
-                if (!reader.TryRead(false, out int value))
+                if (!reader.TryRead(ref tokens, out int value))
                 {
                     return false;
                 }
                 Value8 = value;
             }
             {
-                if (!reader.TryRead(false, out int value))
+                if (!reader.TryRead(ref tokens, out int value))
                 {
                     return false;
                 }
                 Value9 = value;
             }
             {
-                if (!reader.TryRead(true, out int value))
+                if (!reader.TryRead(ref tokens, out int value))
                 {
                     return false;
                 }
