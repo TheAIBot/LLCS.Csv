@@ -1,4 +1,5 @@
-﻿using Microsoft.Toolkit.HighPerformance.Enumerables;
+﻿using LLCS.Csv.Reader;
+using Microsoft.Toolkit.HighPerformance.Enumerables;
 
 namespace LLCS.Csv
 {

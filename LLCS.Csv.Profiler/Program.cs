@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Microsoft.Toolkit.HighPerformance.Enumerables;
 using LLCS.Csv;
+using LLCS.Csv.Reader;
 
 namespace MyBenchmarks
 {
