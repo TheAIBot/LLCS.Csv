@@ -256,7 +256,7 @@ namespace LLCS.Csv
 
             record = new T();
             var tokens = recordChars.Tokenize(_separator);
-            bool couldParse = record.TrySerialize(this, ref tokens);
+            bool couldParse = record.TryDeSerialize(this, ref tokens);
             AdvanceBuffer(recordChars);
             return couldParse;
         }

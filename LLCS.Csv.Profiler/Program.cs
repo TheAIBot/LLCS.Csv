@@ -95,80 +95,18 @@ namespace MyBenchmarks
         public int Value9;
         public int Value10;
 
-        public bool TrySerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens)
+        public bool TryDeSerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens)
         {
-            {
-                if (!reader.TryRead(ref tokens, out int value))
-                {
-                    return false;
-                }
-                Value1 = value;
-            }
-            {
-                if (!reader.TryRead(ref tokens, out int value))
-                {
-                    return false;
-                }
-                Value2 = value;
-            }
-            {
-                if (!reader.TryRead(ref tokens, out int value))
-                {
-                    return false;
-                }
-                Value3 = value;
-            }
-            {
-                if (!reader.TryRead(ref tokens, out int value))
-                {
-                    return false;
-                }
-                Value4 = value;
-            }
-            {
-                if (!reader.TryRead(ref tokens, out int value))
-                {
-                    return false;
-                }
-                Value5 = value;
-            }
-            {
-                if (!reader.TryRead(ref tokens, out int value))
-                {
-                    return false;
-                }
-                Value6 = value;
-            }
-            {
-                if (!reader.TryRead(ref tokens, out int value))
-                {
-                    return false;
-                }
-                Value7 = value;
-            }
-            {
-                if (!reader.TryRead(ref tokens, out int value))
-                {
-                    return false;
-                }
-                Value8 = value;
-            }
-            {
-                if (!reader.TryRead(ref tokens, out int value))
-                {
-                    return false;
-                }
-                Value9 = value;
-            }
-            {
-                if (!reader.TryRead(ref tokens, out int value))
-                {
-                    return false;
-                }
-                Value10 = value;
-            }
-
-            return true;
+            return reader.TryRead(ref tokens, out Value1) &&
+                   reader.TryRead(ref tokens, out Value2) &&
+                   reader.TryRead(ref tokens, out Value3) &&
+                   reader.TryRead(ref tokens, out Value4) &&
+                   reader.TryRead(ref tokens, out Value5) &&
+                   reader.TryRead(ref tokens, out Value6) &&
+                   reader.TryRead(ref tokens, out Value7) &&
+                   reader.TryRead(ref tokens, out Value8) &&
+                   reader.TryRead(ref tokens, out Value9) &&
+                   reader.TryRead(ref tokens, out Value10);
         }
     }
 }

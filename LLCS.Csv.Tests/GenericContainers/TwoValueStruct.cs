@@ -4,7 +4,7 @@ namespace LLCS.Csv.Tests.Reader
 {
     public record struct TwoValueStruct<T1, T2>(T1 Value1, T2 Value2) : ICsvSerializer
     {
-        public bool TrySerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens)
+        public bool TryDeSerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens)
         {
             if (!reader.TryRead(ref tokens, out T1 value1))
             {

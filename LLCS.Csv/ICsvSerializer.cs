@@ -4,6 +4,6 @@ namespace LLCS.Csv
 {
     public interface ICsvSerializer
     {
-        bool TrySerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens);
+        bool TryDeSerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens);
     }
 }
