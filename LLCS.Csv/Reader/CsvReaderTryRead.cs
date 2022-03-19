@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using Microsoft.Toolkit.HighPerformance;
 using Microsoft.Toolkit.HighPerformance.Enumerables;
 
@@ -66,77 +67,72 @@ namespace LLCS.Csv.Reader
             return byte.TryParse(tokens.Current, UnsignedIntegerParseStype, _numberFormatInfo, out value);
         }
 
-        public bool TryRead(ref ReadOnlySpanTokenizer<char> tokens, out int value)
-        {
-            return TryReadInt(ref tokens, out value);
-        }
-
         public bool TryRead<T>(ref ReadOnlySpanTokenizer<char> tokens, out T value)
         {
-            if (typeof(T) == typeof(long))
+            if (IsSame<T, long>.Value)
             {
                 long valueRead;
                 bool couldRead = TryReadLong(ref tokens, out valueRead);
                 value = Unsafe.As<long, T>(ref valueRead);
                 return couldRead;
             }
-            else if (typeof(T) == typeof(ulong))
+            else if (IsSame<T, ulong>.Value)
             {
                 ulong valueRead;
                 bool couldRead = TryReadULong(ref tokens, out valueRead);
                 value = Unsafe.As<ulong, T>(ref valueRead);
                 return couldRead;
             }
-            else if (typeof(T) == typeof(int))
+            else if (IsSame<T, int>.Value)
             {
                 int valueRead;
                 bool couldRead = TryReadInt(ref tokens, out valueRead);
                 value = Unsafe.As<int, T>(ref valueRead);
                 return couldRead;
             }
-            else if (typeof(T) == typeof(uint))
+            else if (IsSame<T, uint>.Value)
             {
                 uint valueRead;
                 bool couldRead = TryReadUInt(ref tokens, out valueRead);
                 value = Unsafe.As<uint, T>(ref valueRead);
                 return couldRead;
             }
-            else if (typeof(T) == typeof(nint))
+            else if (IsSame<T, nint>.Value)
             {
                 nint valueRead;
                 bool couldRead = TryReadNInt(ref tokens, out valueRead);
                 value = Unsafe.As<nint, T>(ref valueRead);
                 return couldRead;
             }
-            else if (typeof(T) == typeof(nuint))
+            else if (IsSame<T, nuint>.Value)
             {
                 nuint valueRead;
                 bool couldRead = TryReadNUInt(ref tokens, out valueRead);
                 value = Unsafe.As<nuint, T>(ref valueRead);
                 return couldRead;
             }
-            else if (typeof(T) == typeof(short))
+            else if (IsSame<T, short>.Value)
             {
                 short valueRead;
                 bool couldRead = TryReadShort(ref tokens, out valueRead);
                 value = Unsafe.As<short, T>(ref valueRead);
                 return couldRead;
             }
-            else if (typeof(T) == typeof(ushort))
+            else if (IsSame<T, ushort>.Value)
             {
                 ushort valueRead;
                 bool couldRead = TryReadUShort(ref tokens, out valueRead);
                 value = Unsafe.As<ushort, T>(ref valueRead);
                 return couldRead;
             }
-            else if (typeof(T) == typeof(sbyte))
+            else if (IsSame<T, sbyte>.Value)
             {
                 sbyte valueRead;
                 bool couldRead = TryReadSByte(ref tokens, out valueRead);
                 value = Unsafe.As<sbyte, T>(ref valueRead);
                 return couldRead;
             }
-            else if (typeof(T) == typeof(byte))
+            else if (IsSame<T, byte>.Value)
             {
                 byte valueRead;
                 bool couldRead = TryReadByte(ref tokens, out valueRead);
@@ -145,7 +141,7 @@ namespace LLCS.Csv.Reader
             }
             else
             {
-                throw new NotSupportedException();
+                throw new Exception();
             }
         }
 
