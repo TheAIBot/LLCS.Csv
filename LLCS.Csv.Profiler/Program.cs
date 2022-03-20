@@ -2,6 +2,7 @@
 using Microsoft.Toolkit.HighPerformance.Enumerables;
 using LLCS.Csv;
 using LLCS.Csv.Reader;
+using LLCS.Csv.Writer;
 
 namespace MyBenchmarks
 {
@@ -96,8 +97,23 @@ namespace MyBenchmarks
         public int Value9;
         public int Value10;
 
+        public void Serialize(CsvWriter writer)
+        {
+            writer.Write(Value1);
+            writer.Write(Value2);
+            writer.Write(Value3);
+            writer.Write(Value4);
+            writer.Write(Value5);
+            writer.Write(Value6);
+            writer.Write(Value7);
+            writer.Write(Value8);
+            writer.Write(Value9);
+            writer.Write(Value10);
+        }
+
         public bool TryDeSerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens)
         {
+            //reader.TryRead<string>(ref tokens, out string _);
             return reader.TryRead(ref tokens, out Value1) &&
                    reader.TryRead(ref tokens, out Value2) &&
                    reader.TryRead(ref tokens, out Value3) &&

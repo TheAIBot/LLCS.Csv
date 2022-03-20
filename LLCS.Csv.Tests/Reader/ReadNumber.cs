@@ -1,13 +1,12 @@
 using LLCS.Csv.Reader;
+using LLCS.Csv.Tests.GenericContainers;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Xunit;
 
 namespace LLCS.Csv.Tests.Reader
 {
-
     public abstract class ReadNumber<T> where T : IFormattable
     {
         private static string CreateCsv(string cultureName, params int[] values)

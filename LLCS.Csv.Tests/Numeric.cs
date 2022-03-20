@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace LLCS.Csv.Tests.Reader
+namespace LLCS.Csv.Tests
 {
     internal static class Numeric<T>
     {
