@@ -1,5 +1,6 @@
 ﻿using LLCS.Csv.Tests.GenericContainers;
 using LLCS.Csv.Writer;
+using System;
 using System.IO;
 using System.Text;
 using Xunit;
@@ -21,7 +22,7 @@ namespace LLCS.Csv.Tests.Writer
             streamWriter.Flush();
             stream.Seek(0, SeekOrigin.Begin);
             string actualCsv = Encoding.UTF8.GetString(stream.ToArray());
-            Assert.Equal("1", actualCsv);
+            Assert.Equal($"1{Environment.NewLine}", actualCsv);
         }
     }
 }

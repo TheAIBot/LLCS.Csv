@@ -41,6 +41,7 @@ namespace LLCS.Csv.Writer
         public void WriteRecord(T record)
         {
             record.Serialize(_writer);
+            _writer.WriteNewLine();
         }
 
         public void Flush()

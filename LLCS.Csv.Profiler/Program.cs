@@ -100,14 +100,23 @@ namespace MyBenchmarks
         public void Serialize(CsvWriter writer)
         {
             writer.Write(Value1);
+            writer.WriteSeparator();
             writer.Write(Value2);
+            writer.WriteSeparator();
             writer.Write(Value3);
+            writer.WriteSeparator();
             writer.Write(Value4);
+            writer.WriteSeparator();
             writer.Write(Value5);
+            writer.WriteSeparator();
             writer.Write(Value6);
+            writer.WriteSeparator();
             writer.Write(Value7);
+            writer.WriteSeparator();
             writer.Write(Value8);
+            writer.WriteSeparator();
             writer.Write(Value9);
+            writer.WriteSeparator();
             writer.Write(Value10);
         }
 

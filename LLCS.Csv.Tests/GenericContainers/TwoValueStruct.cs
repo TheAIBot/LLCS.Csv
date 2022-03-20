@@ -9,6 +9,7 @@ namespace LLCS.Csv.Tests.GenericContainers
         public void Serialize(CsvWriter writer)
         {
             writer.Write(Value1);
+            writer.WriteSeparator();
             writer.Write(Value2);
         }
 
