@@ -14,9 +14,14 @@ namespace MyBenchmarks
         public CsvIntProfiler()
         {
             FilePath = "./csv_ints_profile_file.csv";
-            if (!File.Exists(FilePath))
+            //if (!File.Exists(FilePath))
             {
-                File.WriteAllLines(FilePath, Enumerable.Range(0, 1_000_000_000).Select(x => string.Join(";", Enumerable.Range(x, 10))));
+                using var csvWriter = CsvWriter<Csv10IntsRecord>.ToFile(FilePath);
+                for (int i = 0; i < 100_000_000; i++)
+                {
+                    csvWriter.WriteRecord(new Csv10IntsRecord(i));
+                }
+                //File.WriteAllLines(FilePath, Enumerable.Range(0, 1_000_000).Select(x => string.Join(";", Enumerable.Range(x, 10))));
             }
         }
 
@@ -51,7 +56,8 @@ namespace MyBenchmarks
     {
         public static void Main(string[] args)
         {
-            var FilePath = @"Q:\Github\LLCS.Csv\LLCS.Csv.Profiler\bin\Release\net6.0\bf0b42a8-fe2f-4b8c-b313-0d258a9fb237\bin\Release\net6.0\csv_ints_profile_file.csv";
+            new CsvIntProfiler();
+            var FilePath = "./csv_ints_profile_file.csv";
             using var _reader = CsvReader<Csv10IntsRecord>.FromFile(FilePath);
 
 
@@ -96,6 +102,20 @@ namespace MyBenchmarks
         public int Value8;
         public int Value9;
         public int Value10;
+
+        public Csv10IntsRecord(int value)
+        {
+            Value1 = value + 0;
+            Value2 = value + 1;
+            Value3 = value + 2;
+            Value4 = value + 3;
+            Value5 = value + 4;
+            Value6 = value + 5; 
+            Value7 = value + 6;
+            Value8 = value + 7;
+            Value9 = value + 8;
+            Value10 = value + 9;
+        }
 
         public void Serialize(CsvWriter writer)
         {
