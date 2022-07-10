@@ -67,6 +67,13 @@ namespace LLCS.Csv.Reader
             return byte.TryParse(tokens.Current, UnsignedIntegerParseStype, _numberFormatInfo, out value);
         }
 
+        public bool TryReadString(ref ReadOnlySpanTokenizer<char> tokens, out string value)
+        {
+            tokens.MoveNext();
+            value = tokens.Current.ToString();
+            return true;
+        }
+
         public bool TryRead<T>(ref ReadOnlySpanTokenizer<char> tokens, out T value)
         {
             if (IsSame<T, long>.Value)
@@ -138,6 +145,12 @@ namespace LLCS.Csv.Reader
                 bool couldRead = TryReadByte(ref tokens, out valueRead);
                 value = Unsafe.As<byte, T>(ref valueRead);
                 return couldRead;
+            }
+            else if (IsSame<T, string>.Value)
+            {
+                var lol = tokens.Current.ToString();
+                value = Unsafe.As<string, T>(ref lol);
+                return true;
             }
             else
             {
