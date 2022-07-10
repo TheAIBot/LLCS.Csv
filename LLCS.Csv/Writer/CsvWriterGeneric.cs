@@ -38,6 +38,11 @@ namespace LLCS.Csv.Writer
             return new CsvWriter<T>(stream, culture);
         }
 
+        public static CsvWriter<T> ToStream(StreamWriter stream, CultureInfo culture)
+        {
+            return new CsvWriter<T>(stream, culture);
+        }
+
         public void WriteRecord(T record)
         {
             record.Serialize(_writer);

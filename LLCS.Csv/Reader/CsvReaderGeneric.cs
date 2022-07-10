@@ -32,6 +32,11 @@ namespace LLCS.Csv.Reader
             return new CsvReader<T>(stream);
         }
 
+        public static CsvReader<T> FromStream(StreamReader stream, CultureInfo culture)
+        {
+            return new CsvReader<T>(stream, culture);
+        }
+
         public static CsvReader<T> FromString(string csv)
         {
             return FromString(csv, CultureInfo.CurrentCulture);

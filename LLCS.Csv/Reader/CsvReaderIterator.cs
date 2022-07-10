@@ -3,7 +3,7 @@
 namespace LLCS.Csv.Reader
 {
     public struct CsvReaderIterator<U> : IEnumerator<U>
-    where U : ICsvSerializer, new()
+        where U : ICsvSerializer, new()
     {
         private readonly CsvReader _reader;
         public U Current { get; private set; }
