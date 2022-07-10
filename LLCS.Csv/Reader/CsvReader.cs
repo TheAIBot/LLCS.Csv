@@ -82,7 +82,7 @@ namespace LLCS.Csv.Reader
             return _buffer.Span;
         }
 
-        private async ValueTask<ReadOnlyMemory<char>> GetRecordCharsAsync()
+        private async ValueTask<ReadOnlyMemory<char>> GetRecordCharsAsync(CancellationToken cancellationToken)
         {
             do
             {
@@ -92,7 +92,7 @@ namespace LLCS.Csv.Reader
                     return _buffer.Slice(0, sepIndex);
                 }
 
-            } while (await ReadMoreDataAsync());
+            } while (await ReadMoreDataAsync(cancellationToken));
 
             // Last cell is what remains in the buffer
             return _buffer;
@@ -119,7 +119,7 @@ namespace LLCS.Csv.Reader
             return true;
         }
 
-        private async ValueTask<bool> ReadMoreDataAsync()
+        private async ValueTask<bool> ReadMoreDataAsync(CancellationToken cancellationToken)
         {
             if (_endOfFile)
             {
@@ -135,7 +135,7 @@ namespace LLCS.Csv.Reader
                 MoveDataToStartOfBufferBuffer();
             }
 
-            await ReadIntoBufferAsync();
+            await ReadIntoBufferAsync(cancellationToken);
 
             return true;
         }
@@ -172,11 +172,11 @@ namespace LLCS.Csv.Reader
             _buffer = new Memory<char>(_bufferArray, 0, _buffer.Length + charsRead);
         }
 
-        private async ValueTask ReadIntoBufferAsync()
+        private async ValueTask ReadIntoBufferAsync(CancellationToken cancellationToken)
         {
             // Read data into remaining space
             int charsToRead = _bufferArray.Length - _buffer.Length;
-            int charsRead = await _stream.ReadAsync(_bufferArray.AsMemory(_buffer.Length));
+            int charsRead = await _stream.ReadAsync(_bufferArray.AsMemory(_buffer.Length), cancellationToken);
             if (charsRead < charsToRead)
             {
                 _endOfFile = true;

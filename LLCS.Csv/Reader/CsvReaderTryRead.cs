@@ -169,9 +169,9 @@ namespace LLCS.Csv.Reader
             return couldParse;
         }
 
-        public async ValueTask<(T Value, bool couldRead)> TryReadRecordAsync<T>() where T : ICsvSerializer, new()
+        public async ValueTask<(T Value, bool couldRead)> TryReadRecordAsync<T>(CancellationToken cancellationToken) where T : ICsvSerializer, new()
         {
-            ReadOnlyMemory<char> recordChars = await GetRecordCharsAsync();
+            ReadOnlyMemory<char> recordChars = await GetRecordCharsAsync(cancellationToken);
             return TryDeSerializeRecord<T>(recordChars.Span);
         }
 

@@ -74,7 +74,7 @@ namespace LLCS.Csv.Reader
 
         public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
         {
-            return new CsvReaderAsyncIterator<T>(_reader);
+            return new CsvReaderAsyncIterator<T>(_reader, cancellationToken);
         }
     }
 }

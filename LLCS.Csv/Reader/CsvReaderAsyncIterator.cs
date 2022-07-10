@@ -23,7 +23,7 @@ namespace LLCS.Csv.Reader
                 return false;
             }
 
-            (Current, bool parsed) = await _reader.TryReadRecordAsync<U>();
+            (Current, bool parsed) = await _reader.TryReadRecordAsync<U>(_cancellationToken);
 
             return parsed;
         }
