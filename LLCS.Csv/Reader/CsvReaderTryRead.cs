@@ -168,5 +168,20 @@ namespace LLCS.Csv.Reader
             AdvanceBuffer(recordChars);
             return couldParse;
         }
+
+        public async ValueTask<(T Value, bool couldRead)> TryReadRecordAsync<T>() where T : ICsvSerializer, new()
+        {
+            ReadOnlyMemory<char> recordChars = await GetRecordCharsAsync();
+            return TryDeSerializeRecord<T>(recordChars.Span);
+        }
+
+        private (T Value, bool couldRead) TryDeSerializeRecord<T>(ReadOnlySpan<char> recordChars) where T : ICsvSerializer, new()
+        {
+            var record = new T();
+            var tokens = recordChars.Tokenize(_separator);
+            bool couldParse = record.TryDeSerialize(this, ref tokens);
+            AdvanceBuffer(recordChars);
+            return (record, couldParse);
+        }
     }
 }

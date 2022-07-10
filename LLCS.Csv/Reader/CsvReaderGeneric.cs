@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LLCS.Csv.Reader
 {
-    public sealed class CsvReader<T> : IEnumerable<T>, IDisposable
+    public sealed class CsvReader<T> : IEnumerable<T>, IAsyncEnumerable<T>, IDisposable
         where T : ICsvSerializer, new()
     {
         private readonly CsvReader _reader;
@@ -70,6 +70,11 @@ namespace LLCS.Csv.Reader
         IEnumerator IEnumerable.GetEnumerator()
         {
             return new CsvReaderIterator<T>(_reader);
+        }
+
+        public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+        {
+            return new CsvReaderAsyncIterator<T>(_reader);
         }
     }
 }

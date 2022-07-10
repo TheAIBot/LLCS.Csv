@@ -42,6 +42,18 @@ namespace MyBenchmarks
             return count;
         }
 
+        [Benchmark]
+        public async Task<int> ReadRecordsAsync()
+        {
+            int count = 0;
+            await foreach (var record in _reader)
+            {
+                count++;
+            }
+
+            return count;
+        }
+
         [IterationCleanup]
         public void DisposeCsvReader()
         {

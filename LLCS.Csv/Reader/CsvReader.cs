@@ -82,6 +82,22 @@ namespace LLCS.Csv.Reader
             return _buffer.Span;
         }
 
+        private async ValueTask<ReadOnlyMemory<char>> GetRecordCharsAsync()
+        {
+            do
+            {
+                int sepIndex = _buffer.Span.IndexOf('\n');
+                if (sepIndex != -1)
+                {
+                    return _buffer.Slice(0, sepIndex);
+                }
+
+            } while (await ReadMoreDataAsync());
+
+            // Last cell is what remains in the buffer
+            return _buffer;
+        }
+
         private bool ReadMoreData()
         {
             if (_endOfFile)
@@ -99,6 +115,27 @@ namespace LLCS.Csv.Reader
             }
 
             ReadIntoBuffer();
+
+            return true;
+        }
+
+        private async ValueTask<bool> ReadMoreDataAsync()
+        {
+            if (_endOfFile)
+            {
+                return false;
+            }
+
+            if (_buffer.Length == _bufferArray.Length)
+            {
+                ExtendBuffer();
+            }
+            else
+            {
+                MoveDataToStartOfBufferBuffer();
+            }
+
+            await ReadIntoBufferAsync();
 
             return true;
         }
@@ -126,6 +163,20 @@ namespace LLCS.Csv.Reader
             // Read data into remaining space
             int charsToRead = _bufferArray.Length - _buffer.Length;
             int charsRead = _stream.Read(_bufferArray.AsSpan(_buffer.Length));
+            if (charsRead < charsToRead)
+            {
+                _endOfFile = true;
+            }
+
+            // Extend buffer with newly read data
+            _buffer = new Memory<char>(_bufferArray, 0, _buffer.Length + charsRead);
+        }
+
+        private async ValueTask ReadIntoBufferAsync()
+        {
+            // Read data into remaining space
+            int charsToRead = _bufferArray.Length - _buffer.Length;
+            int charsRead = await _stream.ReadAsync(_bufferArray.AsMemory(_buffer.Length));
             if (charsRead < charsToRead)
             {
                 _endOfFile = true;
