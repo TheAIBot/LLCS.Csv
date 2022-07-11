@@ -7,13 +7,17 @@ namespace LLCS.Csv.Reader
     public sealed partial class CsvReader : IDisposable
     {
         private readonly StreamReader _stream;
+        private readonly CultureInfo _cultureInfo;
         private readonly NumberFormatInfo _numberFormatInfo;
+        private readonly DateTimeFormatInfo _dateTimeFormatInfo;
         private readonly char _separator;
         private bool _endOfFile = false;
         private char[] _bufferArray;
         private Memory<char> _buffer;
         private const NumberStyles SignedIntegerParseStyle = NumberStyles.Integer;
         private const NumberStyles UnsignedIntegerParseStype = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite | NumberStyles.AllowThousands;
+        private const NumberStyles FloatParseStyle = NumberStyles.Float | NumberStyles.AllowThousands;
+        private const DateTimeStyles DateParseStyle = DateTimeStyles.None;
 
         internal bool CanReadMore => !_endOfFile || _buffer.Length > 0;
 
@@ -26,7 +30,9 @@ namespace LLCS.Csv.Reader
         public CsvReader(StreamReader stream, CultureInfo culture)
         {
             _stream = stream;
+            _cultureInfo = culture;
             _numberFormatInfo = culture.NumberFormat;
+            _dateTimeFormatInfo = culture.DateTimeFormat;
             _separator = culture.TextInfo.ListSeparator[0];
             _endOfFile = false;
             _bufferArray = new char[1024 * 16];
