@@ -37,12 +37,17 @@ namespace LLCS.Csv.Reader
 
         public static CsvReader FromFile(string csvPath)
         {
-            return new CsvReader(new StreamReader(csvPath));
+            return FromFile(csvPath, CultureInfo.CurrentCulture);
         }
 
-        public static CsvReader FromStream(StreamReader stream)
+        public static CsvReader FromFile(string csvPath, string culture)
         {
-            return new CsvReader(stream);
+            return FromFile(csvPath, CultureInfo.GetCultureInfo(culture));
+        }
+
+        public static CsvReader FromFile(string csvPath, CultureInfo culture)
+        {
+            return FromStream(new StreamReader(csvPath), culture);
         }
 
         public static CsvReader FromString(string csv)
@@ -57,7 +62,22 @@ namespace LLCS.Csv.Reader
 
         public static CsvReader FromString(string csv, CultureInfo culture)
         {
-            return new CsvReader(new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(csv))), culture);
+            return FromStream(new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(csv))), culture);
+        }
+
+        public static CsvReader FromStream(StreamReader stream)
+        {
+            return FromStream(stream, CultureInfo.CurrentCulture);
+        }
+
+        public static CsvReader FromStream(StreamReader stream, string culture)
+        {
+            return FromStream(stream, CultureInfo.GetCultureInfo(culture));
+        }
+
+        public static CsvReader FromStream(StreamReader stream, CultureInfo culture)
+        {
+            return new CsvReader(stream, culture);
         }
 
         private void AdvanceBuffer(ReadOnlySpan<char> cell)
