@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Linq;
 using Xunit;
 
-namespace LLCS.Csv.Tests.Reader
+namespace LLCS.Csv.Tests
 {
     public abstract class ReadNumber<T> where T : IFormattable
     {

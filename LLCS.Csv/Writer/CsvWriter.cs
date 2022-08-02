@@ -2,7 +2,7 @@
 
 namespace LLCS.Csv.Writer
 {
-    public sealed class CsvWriter : IDisposable
+    public sealed partial class CsvWriter : IDisposable
     {
         private readonly StreamWriter _stream;
         private readonly NumberFormatInfo _numberFormatInfo;
@@ -43,33 +43,6 @@ namespace LLCS.Csv.Writer
         public static CsvWriter ToStream(StreamWriter stream, string culture)
         {
             return new CsvWriter(stream, culture);
-        }
-
-        public void Write<T>(T value)
-        {
-            if (value is ISpanFormattable a)
-            {
-                Write(a, default);
-            }
-            else if (value is ICsvSerializer b)
-            {
-                b.Serialize(this);
-            }
-            else
-            {
-                throw new NotSupportedException($"Type {typeof(T).Name} is not supported.");
-            }
-        }
-
-        public void Write<T>(T value, ReadOnlySpan<char> format) where T : ISpanFormattable
-        {
-            int charsWritten;
-            while (!value.TryFormat(_buffer.Span, out charsWritten, format, _numberFormatInfo))
-            {
-                WriteBufferToStreamMaybeExpandBuffer();
-            }
-
-            _buffer = _buffer.Slice(charsWritten);
         }
 
         public void Write(string value)
