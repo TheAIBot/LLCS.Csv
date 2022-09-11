@@ -1,27 +1,28 @@
 ﻿using BenchmarkDotNet.Attributes;
 using LLCS.Csv.Reader;
-using System.Globalization;
+using Sylvan.Data;
+using Sylvan.Data.Csv;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace MyBenchmarks
 {
     [MemoryDiagnoser]
     public class CsvSalesRecordProfiler
     {
-        private readonly Stream _csvStream;
         [AllowNull]
         private CsvReader<SaledRecord> _reader;
-
-        public CsvSalesRecordProfiler()
-        {
-            _csvStream = new MemoryStream(File.ReadAllBytes("C:\\Users\\Andreas\\Desktop\\100000-Sales-Records\\100000 Sales Records.csv"));
-        }
+        [AllowNull]
+        private CsvDataReader _sylvanReader;
 
         [IterationSetup]
         public void CreateCsvReader()
         {
-            _csvStream.Seek(0, SeekOrigin.Begin);
-            _reader = CsvReader<SaledRecord>.FromStream(new StreamReader(_csvStream,leaveOpen: true ), CultureInfo.InvariantCulture);
+            Stream _csvStream = new MemoryStream(File.ReadAllBytes(".\\CsvFiles\\100000_Sales_Records.csv"));
+            _reader = CsvReader<SaledRecord>.FromStream(new StreamReader(_csvStream, leaveOpen: true), CultureInfo.InvariantCulture);
+
+            Stream _csvStream2 = new MemoryStream(File.ReadAllBytes(".\\CsvFiles\\100000_Sales_Records.csv"));
+            _sylvanReader = CsvDataReader.Create(new StreamReader(_csvStream2, leaveOpen: true));
         }
 
         [Benchmark]
@@ -41,6 +42,18 @@ namespace MyBenchmarks
         {
             int count = 0;
             await foreach (var record in _reader)
+            {
+                count++;
+            }
+
+            return count;
+        }
+
+        [Benchmark]
+        public int SylvanReadRecords()
+        {
+            int count = 0;
+            foreach (var record in _sylvanReader.GetRecords<SaledRecord2>())
             {
                 count++;
             }

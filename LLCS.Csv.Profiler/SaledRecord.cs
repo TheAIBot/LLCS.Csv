@@ -1,25 +1,40 @@
-﻿using Microsoft.Toolkit.HighPerformance.Enumerables;
-using LLCS.Csv;
+﻿using LLCS.Csv;
 using LLCS.Csv.Reader;
 using LLCS.Csv.Writer;
+using Microsoft.Toolkit.HighPerformance.Enumerables;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MyBenchmarks
 {
     internal class SaledRecord : ICsvSerializer
     {
+        [AllowNull]
         public string Region;
+        [AllowNull]
         public string Country;
+        [AllowNull]
         public string ItemType;
+        [AllowNull]
         public string SalesChannel;
+        [AllowNull]
         public string OrderPriority;
+        [AllowNull]
         public string OrderDate;
+        [AllowNull]
         public string OrderID;
+        [AllowNull]
         public string ShipDate;
+        [AllowNull]
         public string UnitsSold;
+        [AllowNull]
         public string UnitPrice;
+        [AllowNull]
         public string UnitCost;
+        [AllowNull]
         public string TotalRevenue;
+        [AllowNull]
         public string TotalCost;
+        [AllowNull]
         public string TotalProfit;
 
         public void Serialize(CsvWriter writer)
@@ -44,5 +59,37 @@ namespace MyBenchmarks
                    reader.TryReadString(ref tokens, out TotalCost) &&
                    reader.TryReadString(ref tokens, out TotalProfit);
         }
+    }
+
+    internal class SaledRecord2
+    {
+        [AllowNull]
+        public string Region { get; set; }
+        [AllowNull]
+        public string Country { get; set; }
+        [AllowNull]
+        public string ItemType { get; set; }
+        [AllowNull]
+        public string SalesChannel { get; set; }
+        [AllowNull]
+        public string OrderPriority { get; set; }
+        [AllowNull]
+        public string OrderDate { get; set; }
+        [AllowNull]
+        public string OrderID { get; set; }
+        [AllowNull]
+        public string ShipDate { get; set; }
+        [AllowNull]
+        public string UnitsSold { get; set; }
+        [AllowNull]
+        public string UnitPrice { get; set; }
+        [AllowNull]
+        public string UnitCost { get; set; }
+        [AllowNull]
+        public string TotalRevenue { get; set; }
+        [AllowNull]
+        public string TotalCost { get; set; }
+        [AllowNull]
+        public string TotalProfit { get; set; }
     }
 }

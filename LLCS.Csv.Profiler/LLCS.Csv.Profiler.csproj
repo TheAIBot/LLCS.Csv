@@ -8,7 +8,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="CsvFiles\100000_Sales_Records.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="CsvFiles\100000_Sales_Records.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
+    <PackageReference Include="Sylvan.Data" Version="0.2.4" />
+    <PackageReference Include="Sylvan.Data.Csv" Version="1.2.1" />
   </ItemGroup>
 
   <ItemGroup>
