@@ -1,5 +1,4 @@
-﻿using Microsoft.Toolkit.HighPerformance;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 
 namespace LLCS.Csv.Reader

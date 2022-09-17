@@ -1,7 +1,7 @@
-﻿using LLCS.Csv;
+﻿using CommunityToolkit.HighPerformance.Enumerables;
+using LLCS.Csv;
 using LLCS.Csv.Reader;
 using LLCS.Csv.Writer;
-using Microsoft.Toolkit.HighPerformance.Enumerables;
 using System.Diagnostics.CodeAnalysis;
 
 namespace MyBenchmarks

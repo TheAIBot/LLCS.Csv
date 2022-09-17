@@ -1,4 +1,4 @@
-﻿using Microsoft.Toolkit.HighPerformance.Enumerables;
+﻿using CommunityToolkit.HighPerformance.Enumerables;
 using LLCS.Csv;
 using LLCS.Csv.Reader;
 using LLCS.Csv.Writer;
@@ -25,7 +25,7 @@ namespace MyBenchmarks
             Value3 = value + 2;
             Value4 = value + 3;
             Value5 = value + 4;
-            Value6 = value + 5; 
+            Value6 = value + 5;
             Value7 = value + 6;
             Value8 = value + 7;
             Value9 = value + 8;

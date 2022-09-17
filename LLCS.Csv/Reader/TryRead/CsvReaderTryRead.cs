@@ -1,5 +1,5 @@
-﻿using Microsoft.Toolkit.HighPerformance;
-using Microsoft.Toolkit.HighPerformance.Enumerables;
+﻿using CommunityToolkit.HighPerformance;
+using CommunityToolkit.HighPerformance.Enumerables;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 

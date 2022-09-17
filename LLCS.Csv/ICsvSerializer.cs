@@ -1,6 +1,6 @@
-﻿using LLCS.Csv.Reader;
+﻿using CommunityToolkit.HighPerformance.Enumerables;
+using LLCS.Csv.Reader;
 using LLCS.Csv.Writer;
-using Microsoft.Toolkit.HighPerformance.Enumerables;
 
 namespace LLCS.Csv
 {

@@ -1,12 +1,4 @@
-﻿using Microsoft.Toolkit.HighPerformance.Buffers;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LLCS.Csv.Writer
+﻿namespace LLCS.Csv.Writer
 {
     public sealed partial class CsvWriter : IDisposable
     {
