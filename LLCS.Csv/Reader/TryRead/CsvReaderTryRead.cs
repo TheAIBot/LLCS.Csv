@@ -1,9 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using Microsoft.Toolkit.HighPerformance;
+﻿using Microsoft.Toolkit.HighPerformance;
 using Microsoft.Toolkit.HighPerformance.Enumerables;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace LLCS.Csv.Reader
 {

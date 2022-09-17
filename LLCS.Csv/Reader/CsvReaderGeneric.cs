@@ -57,6 +57,11 @@ namespace LLCS.Csv.Reader
             throw new NotImplementedException();
         }
 
+        public IEnumerable<T> ReadRecords()
+        {
+            return this;
+        }
+
         public void Dispose()
         {
             _reader.Dispose();
