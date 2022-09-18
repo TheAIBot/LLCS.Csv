@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.HighPerformance.Enumerables;
-﻿using LLCS.Csv.Reader;
+using LLCS.Csv.Reader;
 using LLCS.Csv.Writer;
 using System.Globalization;
 using Xunit;
@@ -101,9 +101,9 @@ public sealed class TryReadInt
     }
 
     [Theory]
-    [InlineData("1.000", 1_000)]
-    [InlineData("10.000", 10_000)]
-    [InlineData("1.000.000", 1_000_000)]
+    [InlineData("1,000", 1_000)]
+    [InlineData("10,000", 10_000)]
+    [InlineData("1,000,000", 1_000_000)]
     public void ReadRecords_WithInvariantCultureThousandSeparator_ExpectSingleRecordReturned(string csv, int expectedNumber)
     {
         var csvReader = CsvReader<IntStorageNumberStyleAndCulture<AllowThousandSeparatorAndInvariantCulture>>.FromString(csv);
@@ -115,9 +115,9 @@ public sealed class TryReadInt
     }
 
     [Theory]
-    [InlineData("1,000", 1_000)]
-    [InlineData("10,000", 10_000)]
-    [InlineData("1,000,000", 1_000_000)]
+    [InlineData("1 000", 1_000)]
+    [InlineData("10 000", 10_000)]
+    [InlineData("1 000 000", 1_000_000)]
     public void ReadRecords_WithFrenchCultureThousandSeparator_ExpectSingleRecordReturned(string csv, int expectedNumber)
     {
         var csvReader = CsvReader<IntStorageNumberStyleAndCulture<AllowThousandSeparatorAndFrenchCulture>>.FromString(csv);
