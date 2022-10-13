@@ -13,5 +13,15 @@ namespace LLCS.Csv.Reader
 
             return value;
         }
+
+        public ReadOnlySpan<char> ReadSpan(ref ReadOnlySpanTokenizer<char> tokens)
+        {
+            if (!TryReadSpan(ref tokens, out ReadOnlySpan<char> value))
+            {
+                ThrowParseException(tokens.Current, "ReadOnlySpan<char>");
+            }
+
+            return value;
+        }
     }
 }
