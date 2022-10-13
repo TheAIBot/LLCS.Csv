@@ -115,9 +115,14 @@ namespace LLCS.Csv.Reader
             }
         }
 
-        public bool TryReadRecord<T>(out T record) where T : ICsvSerializer, new()
+        public bool TryReadRecord<T>([NotNullWhen(true)] out T? record) where T : ICsvSerializer, new()
         {
             ReadOnlySpan<char> recordChars = GetRecordChars();
+            if (recordChars.TrimEnd().Length == 0)
+            {
+                record = default(T);
+                return false;
+            }
 
             record = new T();
             var tokens = recordChars.Tokenize(_separator);

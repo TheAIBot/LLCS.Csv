@@ -2,12 +2,13 @@
 using LLCS.Csv.Reader;
 using LLCS.Csv.Tests.CultureAndStyles;
 using LLCS.Csv.Writer;
+using System.IO;
 using System.Linq;
 using Xunit;
 
-namespace LLCS.Csv.Tests.Reader.TryRead;
+namespace LLCS.Csv.Tests.Reader.Read;
 
-public sealed class TryReadUInt
+public sealed class ReadUInt
 {
     private sealed class UIntStorage : ICsvSerializer
     {
@@ -15,7 +16,11 @@ public sealed class TryReadUInt
 
         public void Serialize(CsvWriter writer) => writer.Write(Value);
 
-        public bool TryDeSerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens) => reader.TryReadUInt(ref tokens, out Value);
+        public bool TryDeSerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens)
+        {
+            Value = reader.ReadUInt(ref tokens);
+            return true;
+        }
     }
 
     private sealed class UIntStorageNumberStyleAndCulture<T> : ICsvSerializer where T : INumberStyleAndCulture, new()
@@ -27,7 +32,8 @@ public sealed class TryReadUInt
         public bool TryDeSerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens)
         {
             T value = new T();
-            return reader.TryReadUInt(ref tokens, value.NumberStyle, value.CultureInfo, out Value);
+            Value = reader.ReadUInt(ref tokens, value.NumberStyle, value.CultureInfo);
+            return true;
         }
     }
 
@@ -112,9 +118,7 @@ public sealed class TryReadUInt
     {
         var csvReader = CsvReader<UIntStorageNumberStyleAndCulture<NoNumberStyleAndInvariantCulture>>.FromString(invalidCsv);
 
-        var actualValues = csvReader.ReadRecords();
-
-        Assert.Empty(actualValues);
+        Assert.Throws<InvalidDataException>(() => csvReader.ReadRecords().ToArray());
     }
 
     [Theory]

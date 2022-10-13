@@ -2,13 +2,14 @@
 using LLCS.Csv.Reader;
 using LLCS.Csv.Tests.CultureAndStyles;
 using LLCS.Csv.Writer;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using Xunit;
 
-namespace LLCS.Csv.Tests.Reader.TryRead;
+namespace LLCS.Csv.Tests.Reader.Read;
 
-public sealed class TryReadBigInteger
+public sealed class ReadBigInteger
 {
     private sealed class BigIntegerStorage : ICsvSerializer
     {
@@ -16,7 +17,11 @@ public sealed class TryReadBigInteger
 
         public void Serialize(CsvWriter writer) => writer.Write(Value);
 
-        public bool TryDeSerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens) => reader.TryReadBigInteger(ref tokens, out Value);
+        public bool TryDeSerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens)
+        {
+            Value = reader.ReadBigInteger(ref tokens);
+            return true;
+        }
     }
 
     private sealed class BigIntegerStorageNumberStyleAndCulture<T> : ICsvSerializer where T : INumberStyleAndCulture, new()
@@ -28,7 +33,8 @@ public sealed class TryReadBigInteger
         public bool TryDeSerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens)
         {
             T value = new T();
-            return reader.TryReadBigInteger(ref tokens, value.NumberStyle, value.CultureInfo, out Value);
+            Value = reader.ReadBigInteger(ref tokens, value.NumberStyle, value.CultureInfo);
+            return true;
         }
     }
 
@@ -120,9 +126,7 @@ public sealed class TryReadBigInteger
     {
         var csvReader = CsvReader<BigIntegerStorageNumberStyleAndCulture<NoNumberStyleAndInvariantCulture>>.FromString(invalidCsv);
 
-        var actualValues = csvReader.ReadRecords();
-
-        Assert.Empty(actualValues);
+        Assert.Throws<InvalidDataException>(() => csvReader.ReadRecords().ToArray());
     }
 
     [Theory]

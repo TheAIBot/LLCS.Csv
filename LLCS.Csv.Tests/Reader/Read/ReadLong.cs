@@ -2,12 +2,13 @@
 using LLCS.Csv.Reader;
 using LLCS.Csv.Tests.CultureAndStyles;
 using LLCS.Csv.Writer;
+using System.IO;
 using System.Linq;
 using Xunit;
 
-namespace LLCS.Csv.Tests.Reader.TryRead;
+namespace LLCS.Csv.Tests.Reader.Read;
 
-public sealed class TryReadLong
+public sealed class ReadLong
 {
     private sealed class LongStorage : ICsvSerializer
     {
@@ -15,7 +16,11 @@ public sealed class TryReadLong
 
         public void Serialize(CsvWriter writer) => writer.Write(Value);
 
-        public bool TryDeSerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens) => reader.TryReadLong(ref tokens, out Value);
+        public bool TryDeSerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens)
+        {
+            Value = reader.ReadLong(ref tokens);
+            return true;
+        }
     }
 
     private sealed class LongStorageNumberStyleAndCulture<T> : ICsvSerializer where T : INumberStyleAndCulture, new()
@@ -27,7 +32,8 @@ public sealed class TryReadLong
         public bool TryDeSerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens)
         {
             T value = new T();
-            return reader.TryReadLong(ref tokens, value.NumberStyle, value.CultureInfo, out Value);
+            Value = reader.ReadLong(ref tokens, value.NumberStyle, value.CultureInfo);
+            return true;
         }
     }
 
@@ -115,9 +121,7 @@ public sealed class TryReadLong
     {
         var csvReader = CsvReader<LongStorageNumberStyleAndCulture<NoNumberStyleAndInvariantCulture>>.FromString(invalidCsv);
 
-        var actualValues = csvReader.ReadRecords();
-
-        Assert.Empty(actualValues);
+        Assert.Throws<InvalidDataException>(() => csvReader.ReadRecords().ToArray());
     }
 
     [Theory]

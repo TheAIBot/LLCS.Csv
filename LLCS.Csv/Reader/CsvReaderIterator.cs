@@ -22,10 +22,10 @@ namespace LLCS.Csv.Reader
                 return false;
             }
 
-            U record;
+            U? record;
             bool parsed = _reader.TryReadRecord(out record);
 
-            Current = record;
+            Current = record!;
             return parsed;
         }
 

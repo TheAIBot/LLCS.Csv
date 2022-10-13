@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace LLCS.Csv.Tests.Reader.TryRead.CultureAndStyles;
+namespace LLCS.Csv.Tests.CultureAndStyles;
 
 internal sealed class NoNumberStyleAndInvariantCulture : INumberStyleAndCulture
 {

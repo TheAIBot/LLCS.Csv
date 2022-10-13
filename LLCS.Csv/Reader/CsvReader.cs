@@ -211,7 +211,7 @@ namespace LLCS.Csv.Reader
             _buffer = new Memory<char>(_bufferArray, 0, _buffer.Length + charsRead);
         }
 
-        private void ThrowParseException(ReadOnlySpan<char> token, string type)
+        private static void ThrowParseException(ReadOnlySpan<char> token, string type)
         {
             throw new InvalidDataException($"Failed to parse {type}. Text: \"{token}\"");
         }

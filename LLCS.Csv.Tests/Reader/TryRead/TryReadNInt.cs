@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.HighPerformance.Enumerables;
 using LLCS.Csv.Reader;
-using LLCS.Csv.Tests.Reader.TryRead.CultureAndStyles;
+using LLCS.Csv.Tests.CultureAndStyles;
 using LLCS.Csv.Writer;
 using System.Linq;
 using Xunit;

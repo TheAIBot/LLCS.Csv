@@ -7,27 +7,27 @@ using Xunit;
 
 namespace LLCS.Csv.Tests.Reader.TryRead;
 
-public sealed class TryReadUInt
+public sealed class TryReadNUInt
 {
-    private sealed class UIntStorage : ICsvSerializer
+    private sealed class NUIntStorage : ICsvSerializer
     {
-        public uint Value;
+        public nuint Value;
 
         public void Serialize(CsvWriter writer) => writer.Write(Value);
 
-        public bool TryDeSerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens) => reader.TryReadUInt(ref tokens, out Value);
+        public bool TryDeSerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens) => reader.TryReadNUInt(ref tokens, out Value);
     }
 
-    private sealed class UIntStorageNumberStyleAndCulture<T> : ICsvSerializer where T : INumberStyleAndCulture, new()
+    private sealed class NUIntStorageNumberStyleAndCulture<T> : ICsvSerializer where T : INumberStyleAndCulture, new()
     {
-        public uint Value;
+        public nuint Value;
 
         public void Serialize(CsvWriter writer) => writer.Write(Value);
 
         public bool TryDeSerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens)
         {
             T value = new T();
-            return reader.TryReadUInt(ref tokens, value.NumberStyle, value.CultureInfo, out Value);
+            return reader.TryReadNUInt(ref tokens, value.NumberStyle, value.CultureInfo, out Value);
         }
     }
 
@@ -35,11 +35,10 @@ public sealed class TryReadUInt
     [InlineData(0u)]
     [InlineData(1u)]
     [InlineData(23u)]
-    [InlineData(uint.MaxValue)]
     public void ReadRecords_WithNumber_ExpectNumberParsed(uint expectedNumber)
     {
         string csv = @$"{expectedNumber}";
-        var csvReader = CsvReader<UIntStorage>.FromString(csv);
+        var csvReader = CsvReader<NUIntStorage>.FromString(csv);
 
         var actualValues = csvReader.ReadRecords();
 
@@ -56,11 +55,11 @@ public sealed class TryReadUInt
     [InlineData("2\n100\n92\n3\n44\n70", 2u, 100u, 92u, 3u, 44u, 70u)]
     public void ReadRecords_WithMultipleRecordsWithANumber_ExpectNumbersParsed(string csv, params uint[] expectedNumbers)
     {
-        var csvReader = CsvReader<UIntStorage>.FromString(csv);
+        var csvReader = CsvReader<NUIntStorage>.FromString(csv);
 
         var actualValues = csvReader.ReadRecords().Select(x => x.Value).ToArray();
 
-        Assert.Equal(expectedNumbers, actualValues);
+        Assert.Equal(expectedNumbers.Select(x => (nuint)x), actualValues);
     }
 
     [Theory]
@@ -68,11 +67,11 @@ public sealed class TryReadUInt
     [InlineData("0\r\n1\r\n2\r\n3\r\n4", 0u, 1u, 2u, 3u, 4u)]
     public void ReadRecords_WithMultipleRecordsWithANumberCarriageReturnNewline_ExpectNumbersParsed(string csv, params uint[] expectedNumbers)
     {
-        var csvReader = CsvReader<UIntStorage>.FromString(csv);
+        var csvReader = CsvReader<NUIntStorage>.FromString(csv);
 
         var actualValues = csvReader.ReadRecords().Select(x => x.Value).ToArray();
 
-        Assert.Equal(expectedNumbers, actualValues);
+        Assert.Equal(expectedNumbers.Select(x => (nuint)x), actualValues);
     }
 
     [Theory]
@@ -82,11 +81,11 @@ public sealed class TryReadUInt
     [InlineData("0\n1\n2\n3\n4\n", 0u, 1u, 2u, 3u, 4u)]
     public void ReadRecords_WithMultipleRecordsWithANumberEndsWithNewline_ExpectNumbersParsed(string csv, params uint[] expectedNumbers)
     {
-        var csvReader = CsvReader<UIntStorage>.FromString(csv);
+        var csvReader = CsvReader<NUIntStorage>.FromString(csv);
 
         var actualValues = csvReader.ReadRecords().Select(x => x.Value).ToArray();
 
-        Assert.Equal(expectedNumbers, actualValues);
+        Assert.Equal(expectedNumbers.Select(x => (nuint)x), actualValues);
     }
 
     [Theory]
@@ -96,21 +95,20 @@ public sealed class TryReadUInt
     [InlineData("0\r\n1\r\n2\r\n3\r\n4\r\n", 0u, 1u, 2u, 3u, 4u)]
     public void ReadRecords_WithMultipleRecordsWithANumberEndsWithCarriageReturnNewline_ExpectNumbersParsed(string csv, params uint[] expectedNumbers)
     {
-        var csvReader = CsvReader<UIntStorage>.FromString(csv);
+        var csvReader = CsvReader<NUIntStorage>.FromString(csv);
 
         var actualValues = csvReader.ReadRecords().Select(x => x.Value).ToArray();
 
-        Assert.Equal(expectedNumbers, actualValues);
+        Assert.Equal(expectedNumbers.Select(x => (nuint)x), actualValues);
     }
 
     [Theory]
     [InlineData(" 1")]
     [InlineData("-1")]
     [InlineData("10.000")]
-    [InlineData("10000000000000")]
     public void ReadRecords_WithNoNumberStyleAndInvalidCsv_ExpectNoRecordsReturned(string invalidCsv)
     {
-        var csvReader = CsvReader<UIntStorageNumberStyleAndCulture<NoNumberStyleAndInvariantCulture>>.FromString(invalidCsv);
+        var csvReader = CsvReader<NUIntStorageNumberStyleAndCulture<NoNumberStyleAndInvariantCulture>>.FromString(invalidCsv);
 
         var actualValues = csvReader.ReadRecords();
 
@@ -123,7 +121,7 @@ public sealed class TryReadUInt
     public void ReadRecords_WithNoNumberStyleAndValidCsv_ExpectSingleRecordReturned(uint expectedNumber)
     {
         string csv = @$"{expectedNumber}";
-        var csvReader = CsvReader<UIntStorageNumberStyleAndCulture<NoNumberStyleAndInvariantCulture>>.FromString(csv);
+        var csvReader = CsvReader<NUIntStorageNumberStyleAndCulture<NoNumberStyleAndInvariantCulture>>.FromString(csv);
 
         var actualValues = csvReader.ReadRecords();
 
@@ -136,7 +134,7 @@ public sealed class TryReadUInt
     [InlineData("10,000", 10_000u)]
     public void ReadRecords_WithInvariantCultureThousandSeparator_ExpectSingleRecordReturned(string csv, uint expectedNumber)
     {
-        var csvReader = CsvReader<UIntStorageNumberStyleAndCulture<AllowThousandSeparatorAndInvariantCulture>>.FromString(csv);
+        var csvReader = CsvReader<NUIntStorageNumberStyleAndCulture<AllowThousandSeparatorAndInvariantCulture>>.FromString(csv);
 
         var actualValues = csvReader.ReadRecords();
 
@@ -149,7 +147,7 @@ public sealed class TryReadUInt
     [InlineData("10 000", 10_000u)]
     public void ReadRecords_WithFrenchCultureThousandSeparator_ExpectSingleRecordReturned(string csv, uint expectedNumber)
     {
-        var csvReader = CsvReader<UIntStorageNumberStyleAndCulture<AllowThousandSeparatorAndFrenchCulture>>.FromString(csv);
+        var csvReader = CsvReader<NUIntStorageNumberStyleAndCulture<AllowThousandSeparatorAndFrenchCulture>>.FromString(csv);
 
         var actualValues = csvReader.ReadRecords();
 
