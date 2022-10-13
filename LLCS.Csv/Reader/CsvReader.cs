@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text;
 
 namespace LLCS.Csv.Reader
@@ -211,6 +212,7 @@ namespace LLCS.Csv.Reader
             _buffer = new Memory<char>(_bufferArray, 0, _buffer.Length + charsRead);
         }
 
+        [DoesNotReturn]
         private static void ThrowParseException(ReadOnlySpan<char> token, string type)
         {
             throw new InvalidDataException($"Failed to parse {type}. Text: \"{token}\"");

@@ -11,8 +11,4 @@
     <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Reader\Read\" />
-  </ItemGroup>
-
 </Project>

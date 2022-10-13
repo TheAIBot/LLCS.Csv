@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MyBenchmarks
 {
-    internal class SaledRecord : ICsvSerializer
+    internal class SaledRecordTryRead : ICsvSerializer
     {
         [AllowNull]
         public string Region;
@@ -58,6 +58,61 @@ namespace MyBenchmarks
                    reader.TryReadString(ref tokens, out TotalRevenue) &&
                    reader.TryReadString(ref tokens, out TotalCost) &&
                    reader.TryReadString(ref tokens, out TotalProfit);
+        }
+    }
+
+    internal class SaledRecordRead : ICsvSerializer
+    {
+        [AllowNull]
+        public string Region;
+        [AllowNull]
+        public string Country;
+        [AllowNull]
+        public string ItemType;
+        [AllowNull]
+        public string SalesChannel;
+        [AllowNull]
+        public string OrderPriority;
+        [AllowNull]
+        public string OrderDate;
+        [AllowNull]
+        public string OrderID;
+        [AllowNull]
+        public string ShipDate;
+        [AllowNull]
+        public string UnitsSold;
+        [AllowNull]
+        public string UnitPrice;
+        [AllowNull]
+        public string UnitCost;
+        [AllowNull]
+        public string TotalRevenue;
+        [AllowNull]
+        public string TotalCost;
+        [AllowNull]
+        public string TotalProfit;
+
+        public void Serialize(CsvWriter writer)
+        {
+        }
+
+        public bool TryDeSerialize(CsvReader reader, ref ReadOnlySpanTokenizer<char> tokens)
+        {
+            Region = reader.ReadString(ref tokens);
+            Country = reader.ReadString(ref tokens);
+            ItemType = reader.ReadString(ref tokens);
+            SalesChannel = reader.ReadString(ref tokens);
+            OrderPriority = reader.ReadString(ref tokens);
+            OrderDate = reader.ReadString(ref tokens);
+            OrderID = reader.ReadString(ref tokens);
+            ShipDate = reader.ReadString(ref tokens);
+            UnitsSold = reader.ReadString(ref tokens);
+            UnitPrice = reader.ReadString(ref tokens);
+            UnitCost = reader.ReadString(ref tokens);
+            TotalRevenue = reader.ReadString(ref tokens);
+            TotalCost = reader.ReadString(ref tokens);
+            TotalProfit = reader.ReadString(ref tokens);
+            return true;
         }
     }
 

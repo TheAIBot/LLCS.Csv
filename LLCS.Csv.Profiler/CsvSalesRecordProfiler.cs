@@ -11,25 +11,30 @@ namespace MyBenchmarks
     public class CsvSalesRecordProfiler
     {
         [AllowNull]
-        private CsvReader<SaledRecord> _reader;
+        private CsvReader<SaledRecordTryRead> _readerTryRead;
+        [AllowNull]
+        private CsvReader<SaledRecordRead> _readerRead;
         [AllowNull]
         private CsvDataReader _sylvanReader;
 
         [IterationSetup]
         public void CreateCsvReader()
         {
-            Stream _csvStream = new MemoryStream(File.ReadAllBytes(".\\CsvFiles\\100000_Sales_Records.csv"));
-            _reader = CsvReader<SaledRecord>.FromStream(new StreamReader(_csvStream, leaveOpen: true), CultureInfo.InvariantCulture);
+            Stream _csvStreamTryRead = new MemoryStream(File.ReadAllBytes(".\\CsvFiles\\100000_Sales_Records.csv"));
+            _readerTryRead = CsvReader<SaledRecordTryRead>.FromStream(new StreamReader(_csvStreamTryRead, leaveOpen: true), CultureInfo.InvariantCulture);
+
+            Stream _csvStreamRead = new MemoryStream(File.ReadAllBytes(".\\CsvFiles\\100000_Sales_Records.csv"));
+            _readerRead = CsvReader<SaledRecordRead>.FromStream(new StreamReader(_csvStreamRead, leaveOpen: true), CultureInfo.InvariantCulture);
 
             Stream _csvStream2 = new MemoryStream(File.ReadAllBytes(".\\CsvFiles\\100000_Sales_Records.csv"));
             _sylvanReader = CsvDataReader.Create(new StreamReader(_csvStream2, leaveOpen: true));
         }
 
         [Benchmark]
-        public int ReadRecords()
+        public int ReadRecordsWithTryRead()
         {
             int count = 0;
-            foreach (var record in _reader.ReadRecords())
+            foreach (var record in _readerTryRead.ReadRecords())
             {
                 count++;
             }
@@ -38,10 +43,34 @@ namespace MyBenchmarks
         }
 
         [Benchmark]
-        public async Task<int> ReadRecordsAsync()
+        public async Task<int> ReadRecordsAsyncWithTryRead()
         {
             int count = 0;
-            await foreach (var record in _reader)
+            await foreach (var record in _readerTryRead)
+            {
+                count++;
+            }
+
+            return count;
+        }
+
+        [Benchmark]
+        public int ReadRecordsWithRead()
+        {
+            int count = 0;
+            foreach (var record in _readerRead.ReadRecords())
+            {
+                count++;
+            }
+
+            return count;
+        }
+
+        [Benchmark]
+        public async Task<int> ReadRecordsAsyncWithRead()
+        {
+            int count = 0;
+            await foreach (var record in _readerRead)
             {
                 count++;
             }
@@ -64,7 +93,8 @@ namespace MyBenchmarks
         [IterationCleanup]
         public void DisposeCsvReader()
         {
-            _reader.Dispose();
+            _readerTryRead.Dispose();
+            _readerRead.Dispose();
         }
     }
 }
