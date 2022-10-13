@@ -1,8 +1,8 @@
 ﻿using BenchmarkDotNet.Attributes;
 using LLCS.Csv.Reader;
 using LLCS.Csv.Writer;
-using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace MyBenchmarks
 {
@@ -34,7 +34,7 @@ namespace MyBenchmarks
         public int ReadRecords()
         {
             int count = 0;
-            foreach (var record in _reader)
+            foreach (var record in _reader.ReadRecords())
             {
                 count++;
             }

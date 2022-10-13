@@ -7,7 +7,7 @@ using System.Globalization;
 
 namespace MyBenchmarks
 {
-    [MemoryDiagnoser]
+    [MemoryDiagnoser, LongRunJob, InProcess]
     public class CsvSalesRecordProfiler
     {
         [AllowNull]
@@ -29,7 +29,7 @@ namespace MyBenchmarks
         public int ReadRecords()
         {
             int count = 0;
-            foreach (var record in _reader)
+            foreach (var record in _reader.ReadRecords())
             {
                 count++;
             }

@@ -62,6 +62,11 @@ namespace LLCS.Csv.Reader
             return this;
         }
 
+        public IAsyncEnumerable<T> ReadRecordsAsync()
+        {
+            return this;
+        }
+
         public void Dispose()
         {
             _reader.Dispose();
