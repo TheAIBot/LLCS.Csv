@@ -7,7 +7,7 @@ using System.Globalization;
 
 namespace MyBenchmarks
 {
-    [MemoryDiagnoser, LongRunJob, InProcess]
+    [MemoryDiagnoser, LongRunJob]
     public class CsvSalesRecordProfiler
     {
         [AllowNull]
@@ -78,7 +78,7 @@ namespace MyBenchmarks
             return count;
         }
 
-        [Benchmark]
+        [Benchmark(Baseline = true)]
         public int SylvanReadRecords()
         {
             int count = 0;
