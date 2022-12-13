@@ -21,7 +21,7 @@ namespace LLCS.Csv.Writer
             _stream = stream;
             _numberFormatInfo = culture.NumberFormat;
             _separator = culture.TextInfo.ListSeparator[0];
-            _bufferArray = new char[1024 * 1024 * 16];
+            _bufferArray = new char[1024 * 1024];
             _buffer = _bufferArray;
         }
 
@@ -103,12 +103,12 @@ namespace LLCS.Csv.Writer
             int usedBufferBytesCount = _bufferArray.Length - _buffer.Length;
             _stream.Write(_bufferArray.AsSpan(0, usedBufferBytesCount));
             _buffer = _bufferArray;
+            _stream.Flush();
         }
 
         public void Dispose()
         {
             Flush();
-            _stream.Flush();
             _stream.Dispose();
         }
     }
