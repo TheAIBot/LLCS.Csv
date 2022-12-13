@@ -9,32 +9,77 @@ namespace MyBenchmarks
     [MemoryDiagnoser]
     public class Csv10IntsRecordProfiler
     {
-        private readonly Stream _csvStream;
+        private const string _fileName = @"E:\\Github\\LLCS.Csv\\LLCS.Csv.Profiler\\bin\\Release\\net7.0csvFile.csv";
         [AllowNull]
-        private CsvReader<Csv10IntsRecord> _reader;
+        private StreamReader _csvStream;
+        [AllowNull]
+        private CsvReader<Csv10IntsRecordTryRead> _readerTryRead;
+        [AllowNull]
+        private CsvReader<Csv10IntsRecordRead> _readerRead;
 
-        public Csv10IntsRecordProfiler()
+        [GlobalSetup]
+        public void Setup()
         {
-            _csvStream = new MemoryStream();
-            using var csvWriter = CsvWriter<Csv10IntsRecord>.ToStream(new StreamWriter(_csvStream), CultureInfo.InvariantCulture);
-            for (int i = 0; i < 1_000_000; i++)
+            if (File.Exists(_fileName))
             {
-                csvWriter.WriteRecord(new Csv10IntsRecord(i));
+                return;
+            }
+            using var csvWriter = CsvWriter<Csv10IntsRecordTryRead>.ToStream(new StreamWriter(_fileName), CultureInfo.InvariantCulture);
+            for (int i = 0; i < 1_000_000_000; i++)
+            {
+                csvWriter.WriteRecord(new Csv10IntsRecordTryRead(i));
             }
         }
 
-        [IterationSetup]
-        public void CreateCsvReader()
+        [IterationSetup(Targets = new[] { "TryReadRecords", "TryReadRecordsAsync" })]
+        public void CreateCsvReaderTryRead()
         {
-            _csvStream.Seek(0, SeekOrigin.Begin);
-            _reader = CsvReader<Csv10IntsRecord>.FromStream(new StreamReader(_csvStream, leaveOpen: true), CultureInfo.InvariantCulture);
+            _csvStream = new StreamReader(_fileName);
+            _readerTryRead = CsvReader<Csv10IntsRecordTryRead>.FromStream(_csvStream, CultureInfo.InvariantCulture);
+        }
+
+        [Benchmark]
+        public int TryReadRecords()
+        {
+            int count = 0;
+            foreach (var record in _readerTryRead.ReadRecords())
+            {
+                count++;
+            }
+
+            return count;
+        }
+
+        [Benchmark]
+        public async Task<int> TryReadRecordsAsync()
+        {
+            int count = 0;
+            await foreach (var record in _readerTryRead)
+            {
+                count++;
+            }
+
+            return count;
+        }
+
+        [IterationCleanup(Targets = new[] { "TryReadRecords", "TryReadRecordsAsync" })]
+        public void DisposeCsvReaderTryRead()
+        {
+            _readerTryRead.Dispose();
+        }
+
+        [IterationSetup(Targets = new[] { "ReadRecords", "ReadRecordsAsync" })]
+        public void CreateCsvReaderRead()
+        {
+            _csvStream = new StreamReader(_fileName);
+            _readerRead = CsvReader<Csv10IntsRecordRead>.FromStream(_csvStream, CultureInfo.InvariantCulture);
         }
 
         [Benchmark]
         public int ReadRecords()
         {
             int count = 0;
-            foreach (var record in _reader.ReadRecords())
+            foreach (var record in _readerRead.ReadRecords())
             {
                 count++;
             }
@@ -46,7 +91,7 @@ namespace MyBenchmarks
         public async Task<int> ReadRecordsAsync()
         {
             int count = 0;
-            await foreach (var record in _reader)
+            await foreach (var record in _readerRead)
             {
                 count++;
             }
@@ -54,10 +99,10 @@ namespace MyBenchmarks
             return count;
         }
 
-        [IterationCleanup]
-        public void DisposeCsvReader()
+        [IterationCleanup(Targets = new[] { "ReadRecords", "ReadRecordsAsync" })]
+        public void DisposeCsvReaderRead()
         {
-            _reader.Dispose();
+            _readerRead.Dispose();
         }
     }
 }
